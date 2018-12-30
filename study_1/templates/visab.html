@@ -1,0 +1,166 @@
+
+<!-- some of this code reused from Pandey et. al 2015 -->
+
+<link rel="stylesheet" type="text/css" href="../static/main.css">
+
+<body>
+<div class="container">
+  <h1>Visual Ability</h1>
+      
+    <p>a) Which of the following options represent the cube shown when folded?</p>
+    <p><img src="../static/1.gif" alt=""/></p>
+     
+   <p align="left">   
+    <form id="visab_q1">
+
+      <input type="radio" name="radio1" id="radio1" value="A">
+      <label for="radio9">A</label>
+      <br>
+      <input type="radio" name="radio1" id="radio2" value="B">
+      <label for="radio3">B</label><br>
+      <input type="radio" name="radio1" id="radio3" value="C">
+      <label for="radio4">C</label><br>
+      <input type="radio" name="radio1" id="radio4" value="D">
+      <label for="radio5">D</label>
+</form>
+<br />    
+
+     </p>
+         <p>&nbsp;</p>
+    <p>b) Pick the option that completes the design shown below.</p>
+    <p><img src="../static/2.jpg"  alt=""/></p>
+
+     
+<p align="left">
+      
+    <form id="visab_q2">
+      
+	<input type="radio" name="radio2" id="radio5" value="1">
+	<label for="radio9">1</label>
+      <br>
+      <input type="radio" name="radio2" id="radio6" value="2">
+      <label for="radio3">2</label><br>
+      <input type="radio" name="radio2" id="radio7" value="3">
+      <label for="radio4">3</label><br>
+      <input type="radio" name="radio2" id="radio8" value="4">
+      <label for="radio5">4</label><br>
+      <input type="radio" name="radio2" id="radio9" value="5">
+      <label for="radio5">5</label><br>
+      <input type="radio" name="radio2" id="radio10" value="6">
+      <label for="radio5">6</label>
+    </form>
+<br />    
+
+</p>
+     
+     
+         <p>&nbsp;</p>
+    <p>c) Pick the option that completes the design shown below.</p><p align="left">
+    <p><img src="../static/3.gif"  alt=""/></p>
+   
+   <p align="left">       
+    <form id="visab_q3">
+      <input type="radio" name="radio3" id="radio11" value="1">
+      
+      <label for="radio9">1</label>
+      <br>
+<input type="radio" name="radio3" id="radio12" value="2">
+      <label for="radio3">2</label><br>
+      <input type="radio" name="radio3" id="radio13" value="3">
+      <label for="radio4">3</label><br>
+      <input type="radio" name="radio3" id="radio14" value="4">
+      <label for="radio5">4</label><br>
+      <input type="radio" name="radio3" id="radio15" value="5">
+      <label for="radio5">5</label><br>
+      <input type="radio" name="radio3" id="radio16" value="6">
+      <label for="radio5">6</label>
+    </form>
+<br />    
+
+
+</p>    
+     
+         <p>&nbsp;</p>
+    <p>d) What is the approximate value represented by the 2nd bar?</p><p align="left">
+    <p><img src="../static/4.jpg"  alt=""/></p>
+     
+    <p align="left">       
+      <form id="visab_q4">
+      <input type="radio" name="radio4" id="radio17" value="100">
+      
+      <label for="radio9">100</label>
+      <br>
+<input type="radio" name="radio4" id="radio18" value="-20">
+      <label for="radio3">-20</label><br>
+      <input type="radio" name="radio4" id="radio19" value="20">
+      <label for="radio4">20</label><br>
+      <input type="radio" name="radio4" id="radio20" value="55">
+      <label for="radio5">55</label>
+    </form>
+<br />    
+</p>
+
+     
+     
+         <p>&nbsp;</p>
+    <p>e) Which of the following options represents the cube shown when folded?</p><p align="left">
+    <p><img src="../static/5.gif" alt=""/></p>
+    
+         <p align="left">  
+      <form id="visab_q5">
+
+      <input type="radio" name="radio5" id="radio21" value="A">
+      
+      <label for="radio9">A</label>
+      <br>
+<input type="radio" name="radio5" id="radio22" value="B">
+      <label for="radio3">B</label><br>
+      <input type="radio" name="radio5" id="radio23" value="C">
+      <label for="radio4">C</label><br>
+      <input type="radio" name="radio5" id="radio24" value="D">
+      <label for="radio5">D</label>
+      </form>
+<br />    
+</p>
+
+
+    <table width="421">
+      
+      <tr>
+      <td width="150">
+        <h3>&nbsp;</h3></td>
+      <td width="102"><input type="submit" width="100px" onclick="advance()" value="Proceed"/></td>
+      <td width="153">&nbsp;</td>
+    </tr>
+</table>
+</form>
+   </p>
+   <p class="padding">&nbsp;</p>
+   <p class="padding">&nbsp;</p>
+  </div>
+
+</p>
+<div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript">
+  var session_start_time = new Date()
+
+  function advance() {
+    var end_time = new Date()
+    localStorage.setItem("visab_time", (end_time - session_start_time)/1000 + "s")
+
+    for (i=0;i<5;i++) 
+    {
+      id = "visab_q" + (i+1); 
+      let val = $('#' + id + ' > input:checked').val()
+      if (val) {
+        localStorage.setItem(id,val);
+      }
+      else {
+        alert("Please answer all questions to proceed.")
+        return;
+      }
+    }
+    window.location.href = "../chartfam"
+  }
+</script>

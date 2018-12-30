@@ -1,0 +1,80 @@
+<link rel="stylesheet" type="text/css" href="../static/main.css">
+
+
+<div class="container">
+<h1>Research Consent Form</h1>
+<p><b>Researcher:</b>  Jacob William Keith Ritchie</p>
+<p><b>Affiliation:</b> Department of Computer Science, University of Toronto</p>
+
+
+<p>You are invited to participate in a research study investigating the perception of interactive bar charts. This research encompasses a <b><i>questionnaire</i></b> that will evaluate your education level, visual ability, personality traits, level of familiarity with charts, and your ability to answer questions using static or interactive bar charts. </p>
+
+<p>Your decision to participate is voluntary and you are free to withdraw at any time without any consequences. You are not required to answer any questions you do not feel comfortable answering.</p>
+
+<p>Upon completion of the experiment, you will be given a participant ID to submit on the Amazon Mechanical Turk website. You can withdraw from the study either by not submitting your participant ID, or by emailing the researchers with your participant ID and requesting to withdraw. In both cases your data will be destroyed and not included in the published results of the research study. After results are made public, anonymized data may be shared publicly and you will no longer be able to withdraw from the study.</p>
+
+<p>By submitting this form, you indicate that you understand the following:</p>
+<ul>
+<li>The purpose of the study is to understand the effects of interactivity on perception of bar charts;</li>
+<li>All data that are shown in the charts included in the study are <b><i>artificial</b></i>. Any locations referenced are purely fictional;</li>
+<li>I will be asked to complete a questionnaire. I can expect the questionnaire to take <b><i>approximately 5 minutes</b></i> to complete;</li>
+<li>I agree to have my questionnaire responses recorded, as well as the amount of time spent using any interactive elements in the questionnaire;  </li>
+<li>I agree to have my monitor resolution, operating system version and web browser version recorded;</li>
+<li>The researchers do not foresee any risks or stresses beyond what one might experience in a typical day of work;</li>
+<li>I will be compensated $0.90 (USD) for the session;</li>
+<li>I am free to withdraw the study at any time before the results of the study are made public (even after the completion of the study) and if I do wish so, the researcher will also destroy all respective data collected insofar;</li>
+<li>All data collected in this study will be kept secure. <b><i>Survey responses will be stored in a secure device.</b></i> Only the researchers involved in this study will have access. In all data files, my responses will be identified with a code in order to preserve confidentiality. All data containing potentially identifying information will be destroyed 3 years after publication of results;</li>
+<li>Data collected may be used in research journals, conferences, or other scholarly activities, or it may be shared publicly with other researchers. In these cases, no identifying information will be provided to the audience;</li>
+<li>I am at least 18 years of age;</li>
+<li>I am free to ask questions about the process at any time. I can ask by contacting: 
+	<ul>
+<li>Jacob Ritchie: jritchie@dgp.toronto.edu, (647) 549-5189</li>
+<li>Fanny Chevalier: fanny@dgp.toronto.edu, (416) 978-4391</li>
+<li>Daniel Wigdor: daniel@dgp.toronto.edu, (416) 978-7777</li>
+</ul>
+<li>If requested, I will receive a copy of this form for my records;</li>
+<li>To learn about publications arising from this work, I can visit www.dgp.toronto.edu/~dwigdor/publications, or email the researchers at the email addresses provided above;</li>
+
+</ul>
+
+	
+<p><b>The research study you are participating in may be reviewed for quality assurance to make sure that the required laws and guidelines are followed. If chosen, (a) representative(s) of the Human Research Ethics Program (HREP) may access study-related data and/or consent materials as part of the review. All information accessed by the HREP will be upheld to the same level of confidentiality that has been stated by the research team.</b></p>
+
+<p>If you have any questions about your rights as a participant, please contact the University of Toronto Ethics Review Office at ethics.review@utoronto.ca or (416) 946-3273.</p>
+
+<input type="checkbox" value="consent"> I have read and understood the above information.</input><br><br>
+<input type="submit" onclick="advance()" value="Proceed"></input>
+<div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript">
+
+	var session_start_time = new Date()
+
+	function advance() {
+		var end_time = new Date()
+
+    	localStorage.setItem("consent_time", (end_time - session_start_time)/1000 + "s")
+		let checked = $('input:checked').val()
+		if (checked) {
+			localStorage.setItem("consent","true");
+			response = $.ajax
+		    ({
+		        type: "POST",
+		        url: 'https://dgp-vis-mt.herokuapp.com/gen_id/',
+		        dataType: 'json',
+		        contentType: 'application/json',
+		        async: false,
+		        data: JSON.stringify(localStorage)
+		    }).responseJSON
+
+		    localStorage.setItem("condition",response[0])
+		    localStorage.setItem("user_id",response[1])
+
+			window.location.href = "calibration"
+		}
+		else {
+			alert("Please check the box and provide consent to proceed.")
+
+		}
+	}
+</script>

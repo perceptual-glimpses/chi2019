@@ -1,0 +1,26 @@
+<html>
+<p>Which experimental condition</p>
+<p align="left">
+	<form id="condition">
+      <input type="radio" name="radio2" id="radio12" value="A">
+      <label for="radio12">A</label>
+      <br>
+      <input type="radio" name="radio2" id="radio13" value="B">
+      <label for="radio13">B</label>
+      <br>
+      <input type="radio" name="radio2" id="radio14" value="C">
+      <label for="radio14">C</label>
+      <br>
+			<input type="radio" name="radio2" id="radio15" value="D">
+			<label for="radio15">D</label>
+  	</form>
+    </p>
+		<input type="submit" value="Proceed" onclick="advance()"></input>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script type="text/javascript">
+
+		function advance() {
+				let condition = $('#condition > input:checked').val(); localStorage.setItem("condition",condition)
+			}
+		</script>
+</html>

@@ -1,0 +1,1456 @@
+<!doctype html>
+<html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<style>
+
+.bar {
+  fill: steelblue;
+}
+
+.axis--x path {
+  display: none;
+}
+
+.marker {
+    r: 20;
+}
+
+.endpoint {
+    fill: orange;
+}
+
+.startpoint {
+    fill: orange;
+}
+
+#question, #reminder {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+#reminder {
+ color: red;
+}
+
+/* from W3Schools*/
+
+.button {
+    background-color: steelblue; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin:4px auto ;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.button:active {
+  background-color: orange;
+  border: none;
+}
+
+.view-button:focus {
+  background-color: orange;
+  border: none;
+}
+
+.screenshot-button {
+  background-color: red;
+}
+
+.last-clicked {
+  background-color: orange;
+}
+
+.transform-button {
+  width:840px;
+}
+
+.centered-container {
+  text-align: center;
+  width:960px;
+}
+
+.title {
+  font-size: 40px;
+  padding: 0px;
+  margin-bottom: 0px;
+  font-family: sans-serif;
+  color: steelblue;
+}
+
+.modal-dialog {
+ margin:10px;
+}
+
+#answer {
+  width: 400px;
+  margin-bottom: 10px;
+}
+
+.modal-footer .btn-success {
+  margin-right: 20px
+}
+
+}
+
+</style>
+
+<div class="centered-container">
+  <div id="capture">
+      <p class="title"></p>
+      <svg width="960" height="600">
+      </svg>
+  </div>
+  <div class="centered-container">
+
+    <button id="trendline" class="button view-button">Trendline Deviation</button>
+    <button id="renormalize" class="button view-button">Renormalize</button>
+    <button id="diff" class="button view-button">Finite Differences</button>
+    <button id="cum" class="button view-button">Cumulative</button>
+    <br>
+    <button id="cut" class="button view-button">Cut Axis</button>
+    <button id="fold" class="button view-button">Fold Axis</button>
+    <button id="filter" class="button view-button">Filter Categories</button>
+    <button id="zoom" class="button view-button">Zoom in on Range</button>
+    <br>
+    <button class="button transform-button">Transform!</button>
+    <br>
+    <br>
+    <p id="question"></p>
+    <input type="text" id="answer"/>
+    <br>
+    <p id="reminder">Take a screenshot with space and circle a graph feature before proceeding.</p>
+    <button id="proceed" type="button" class="btn btn-primary" disabled="true">Proceed</button>
+  </div>
+</div>
+<!---  from Bootstrap documentation: https://getbootstrap.com/docs/4.0/components/modal/ !-->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal-dialog" role="document">
+  <div class="modal-content" style="width:1000px">
+    <div class="modal-header">
+      <h5 class="modal-title" id="exampleModalLabel">Screenshot</h5>
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" onclick="screenshot_not_ok()">Cancel</button>
+      <button type="button" class="btn btn-primary btn-success"  onlick="screenshot_ok()">OK</button>
+    </div>
+  </div>
+</div>
+</div>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="../static/least-squares.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="../static/html2canvas.min.js"></script>
+<!-- Required to convert named colors to RGB -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/canvg/1.4/rgbcolor.min.js"></script>
+<!-- Optional if you want blur -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/stackblur-canvas/1.4.1/stackblur.min.js"></script>
+<!-- Main canvg code -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/canvg/dist/browser/canvg.min.js"></script>
+<!-- Latest compiled and minified CSS -->
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script type="text/javascript">
+
+  var logging_str = "";
+  logging_str = logging_str + "height: " + $(window).height() + "px;"
+  logging_str = logging_str + "width: " + $(window).height() + "px;"
+
+  var session_start_time = new Date()
+  var start_time = new Date()
+  var end_time = new Date()
+
+  $(".transform-button").on("mousedown", function () {
+    start_time = new Date();
+    logging_str = logging_str + "click(" + $(".last-clicked").text() + "): " + (start_time - session_start_time)/1000 + "s;"
+  }).on("touchstart", function () {
+    start_time = new Date();
+    logging_str = logging_str + "click(" + $(".last-clicked").text() + "): " + (start_time - session_start_time)/1000 + "s;"
+  })
+
+  $(".transform-button").on("mouseup", function () {
+    end_time = new Date();
+    logging_str = logging_str + "duration: " + (end_time - start_time)/1000 + "s;"
+  }).on("touchend", function () {
+    end_time = new Date();
+    logging_str = logging_str + "duration: " + (end_time - start_time)/1000 + "s;"
+  });
+
+  $(".view-button").on("click", function () {
+    end_time = new Date();
+    logging_str = logging_str + "Change View("+ $(this).text() +"): " + (end_time - session_start_time)/1000 + "s;"
+  });
+
+</script>
+<script>
+
+
+//make_vis("data3.tsv")
+var filename = "../static/data2.tsv"
+//function make_vis(filename) {
+function make_active(id) {
+svg.call(d3.drag(null))
+$("button").removeClass("last-clicked");
+$("#" + id).addClass("last-clicked");
+
+remove_line() ;
+if ($(".last-clicked").attr("id") == "trendline") {
+  update_trendline();
+  d3.selectAll(".marker").style("r","20").style("fill","orange")
+}
+
+set_click_listeners(id);
+
+if ($(".last-clicked").attr("id") == "cut") {
+    update_cut_axis_line();
+ }
+
+if ($(".last-clicked").attr("id") == "zoom") {
+  update_x_axis_underline("zoomline",x(zoom_years[0]) + x.bandwidth()/2, x(zoom_years[1]) + x.bandwidth()/2)
+ }
+
+if ($(".last-clicked").attr("id") == "fold") {
+  update_x_axis_underline("foldline",x(fold_years[0]) + x.bandwidth()/2, x(fold_years[1]) + x.bandwidth()/2)
+ }
+
+
+ svg.selectAll(".bar").style("fill","steelblue");
+ if ( ($(".last-clicked").attr("id") == "renormalize")) {
+  svg.selectAll(".bar").filter(function (d,i) {return d.letter == renormalize_year}).style("fill","orange");
+ }
+
+
+if ($(".last-clicked").attr("id") == "filter") {
+  svg.selectAll(".bar").filter(function (d,i) {return (filter_list.indexOf(+d.letter)  >= 0) || (filter_list.indexOf(d.letter)  >= 0) }).style("fill","orange");
+}
+
+if ($(".last-clicked").attr("id") == "zoom") {
+  svg.selectAll(".bar").filter(zoom_func).style("fill","orange");
+}
+
+if ($(".last-clicked").attr("id") == "fold") {
+  svg.selectAll(".bar").filter(fold_highlight_func).style("fill","orange");
+}
+}
+
+$(".view-button").click(function() {make_active(this.id)})
+
+// Create basic chart elements
+
+var svg = d3.select("svg"),
+  margin = {top:10, right: 20, bottom: 60, left: 90},
+  width = +svg.attr("width") - margin.left - margin.right,
+  height = +svg.attr("height") - margin.top - margin.bottom;
+
+
+var x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
+  old_x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
+  y = d3.scaleLinear().rangeRound([height, 0]);
+
+var g = svg.append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+// create functions to draw bars
+function getBarFunctions(keyName,y) {
+function y_function(d) {
+  if (x(d.letter) == undefined) {
+    return y(0);
+  }
+  if (d[keyName]> 0){
+        return y(d[keyName]);
+    }
+    else {
+      return y(0);
+    }jj
+  }
+
+function height_function(d) {
+
+  if (x(d.letter) == undefined) {
+    return 0
+  }
+
+  min_val = Math.min(y.domain()[0],y.domain()[1]);
+
+  if (d[keyName] > 0){
+      return y(0) - y(d[keyName])
+  }
+  else {
+    return y(d[keyName]) - y(0);
+  }
+}
+
+return {"y": y_function, "height": height_function};
+}
+
+function drawChart(variable, title,cut) {
+  svg.append("text").attr("class","ylabel").attr("x","-350").attr("y","20").attr("transform","rotate(-90)").style("font-family","sans-serif")
+  update_title(title)
+  f = function(d) { return d[variable]}
+
+  if (d3.min(dd,f) * d3.max(dd,f) >= 0) {
+    //if it doesn't cross 0, use whole chart with 0 at either the top or bottom
+    if (d3.min(dd,f) >= 0) {
+      min_val = 0;
+      max_val = d3.max(dd,f);
+    }
+    else {
+      min_val = d3.min(dd,f);
+      max_val = 0;
+    }
+  }
+  else {
+     max_val = Math.max(-d3.min(dd, f), d3.max(dd, f))
+     min_val = Math.min(-d3.max(dd, f), d3.min(dd, f))
+  }
+
+  tick_vals = [min_val,(max_val-min_val) * 1/4 + min_val,(max_val-min_val) * 2/4 + min_val,(max_val-min_val) * 3/4 + min_val,max_val]
+
+  tick_fn = d3.axisLeft(y)
+            .ticks(10)
+            .tickSize(width  - 8)
+            //.tickFormat( (d) => (d3.format("(.0f")(d)) )//.attrTween("x",null);
+
+
+  console.log(min_val,max_val)
+
+  bar_functions = getBarFunctions(variable,y)
+  if (cut != undefined) {
+    min_val = cut_val;
+    bar_functions = {"y" : function(d) {return y(d[variable])},"height" : function(d) {return Math.min(Math.max(y(0) - y(d[variable]),0), Math.max(y(cut_val) - y(d[variable]),0))} };
+  }
+
+  y.domain([min_val, max_val]);
+
+  if (g.selectAll("g.axis--y").empty()) {
+    g.append("g")
+      .attr("class", "axis axis--y")
+      .call(tick_fn)
+    }
+  else {
+      g.selectAll("g.axis--y").transition(500).call(tick_fn);
+    }
+
+
+  g.selectAll(".axis--y").style("transform", "translate(845px,0px)")
+  g.selectAll(".axis--y .domain").style("stroke", "rgba(255,255,255,0)")
+  g.selectAll(".axis--y .tick text").style("font-size", "12px").attr("dx", "-0.32em")
+  g.selectAll(".y-axis-text").style("font-size", "13px").style("font-family", "Arial").style("text-anchor", "middle")
+  svg.selectAll(".axis--x path").attr("display", "none")
+
+  g.selectAll(".bar")
+    .data(dd, function(d) { return d.letter; })
+    .attr("id",function(d,i) {return d.letter;})
+    //.call(d3.axisLeft(y).ticks(10))
+    .transition(500)
+    .attr("y", bar_functions["y"])
+    .attr("height", bar_functions["height"])
+    //.style("fill","steelblue");
+    //reorder_nodes(()=>true)
+
+
+
+ // hack and slash
+ // figure out how to use filter so the stupid redundant bars don't get added at all
+
+}
+
+
+// load data and store in global variable
+
+var dd;
+var renormalize_year;
+var slope;
+var b;
+var screenshots = []
+
+
+function load_function(error, data) {
+if (error) throw error;
+
+dd = data;
+
+// Add derived values
+for (i=1;i<dd.length;i++)
+{
+    dd[i]["i"] = i
+}
+
+
+dd[0]["cum"] = dd[0]["frequency"]
+    for (i=1;i<dd.length;i++)
+    {
+        dd[i]["cum"] = dd[i-1]["cum"] + dd[i]["frequency"]
+    }
+
+dd[0]["diff"] = 0
+for (i=1;i<dd.length;i++)
+{
+    dd[i]["diff"] = dd[i]["frequency"] - dd[i-1]["frequency"]
+}
+
+for (i=0;i<dd.length;i++)
+{
+    dd[i]["log"] =Math.log(Math.abs(dd[i]["frequency"]))
+}
+
+for (i=0;i<dd.length;i++)
+{
+    dd[i]["ren"] = dd[i]["frequency"] - dd[2]["frequency"]
+}
+
+renormalize_year = dd[2]["letter"];
+
+draw_initial_x_components(data)
+
+drawChart("frequency",titles["Default"])
+update_title(titles["Default"], titles["Y"])
+// TODO Make it actually save the screenshot */
+d3.select("body")
+    .on("keydown", function () {
+      if (d3.event.keyCode == 32 && (! $('#exampleModal').hasClass('in')) && (! $("#answer").is(":focus")) ) {
+        screenshoot()
+        $("#exampleModal").modal('show')
+      }
+});
+
+ret = {}
+//lsq = require('least-squares')
+lsq(dd.map(d => + d.letter), dd.map(d => +d.frequency), ret)
+console.log(ret)
+min_x = x(d3.min(x.domain())) + x.bandwidth()/2;
+min_y = y(dd[0].frequency); min_y = y(ret.m * +dd[0].letter + ret.b)
+max_x = x(d3.max(x.domain())) + x.bandwidth()/2;
+max_y = y(dd[dd.length-1].frequency); max_y = y(ret.m * +dd[dd.length-1].letter + ret.b)
+
+mx = d3.max(dd.map(d => +d.frequency)), mm =  d3.min(dd.map(d => +d.frequency))
+cut_val = ((mx + mm)/2).toPrecision(3);
+
+if (cut_val.indexOf("e") > -1){
+  cut_val = ((mx + mm)/2).toPrecision(3).slice(0,4) * 10 ** ((mx + mm)/2).toPrecision(3).slice(6,)
+}
+else {
+  cut_val = +cut_val
+}
+
+reorder_nodes(()=>false);
+redraw_x(dd);//make_active("") clear()
+}
+
+function process_function(d) {
+d.frequency = +d.frequency;
+return d;
+}
+
+d3.tsv(filename, process_function,load_function);
+
+
+function new_graph(filename) {
+d3.selectAll("g").html("");
+d3.selectAll(".ylabel").remove();
+d3.tsv(filename, process_function,load_function);
+}
+
+
+function screenshoot() {
+// sourced from stackoverflow: https://stackoverflow.com/questions/18271898/html-and-svg-to-canvas-javascript
+var svgElements= $("#capture").find('svg');
+
+
+
+//replace all svgs with a temp canvas
+svgElements.each(function () {
+    var canvas, xml;
+
+    canvas = document.createElement("canvas");
+    canvas.className = "screenShotTempCanvas";
+    //convert SVG into a XML string
+    xml = (new XMLSerializer()).serializeToString(this);
+
+    // Removing the name space as IE throws an error
+    xml = xml.replace(/xmlns=\"http:\/\/www\.w3\.org\/2000\/svg\"/, '');
+
+    //draw the SVG onto a canvas
+    canvg(canvas, xml);
+    $(canvas).insertAfter(this);
+    //hide the SVG element
+    this.className = "tempHide";
+   //$(this).hide();
+});
+
+html2canvas(document.querySelector("#capture")).then(canvas => {
+    //https://stackoverflow.com/questions/3318565/any-way-to-clone-html5-canvas-element-with-its-content
+    var saveCanvas = document.createElement('canvas');
+    var save_ctx = saveCanvas.getContext('2d');
+    saveCanvas.width = canvas.width;
+    saveCanvas.height = canvas.height;
+    save_ctx.drawImage(canvas, 0, 0);
+
+    $(".modal-body")[0].appendChild(canvas)
+    $("canvas").attr('id','myCanvas')
+    //https://www.w3schools.com/tags/canvas_beginpath.asp
+    var c=document.getElementById("myCanvas");
+    var ctx=c.getContext("2d");
+
+    function down() {
+      pts = []
+      is_drawing=1;
+    }
+
+    function move() {
+      if (is_drawing == 1) {
+        // magic numbers
+        event_x = d3.event.clientX; event_y = d3.event.clientY;
+        if (event_x == undefined) {event_x = d3.event.targetTouches[0].clientX; event_y = d3.event.targetTouches[0].clientY}
+        redraw()
+        pts.push([(event_x - c.getBoundingClientRect().x ) * $("#myCanvas").attr('width') / d3.select("#myCanvas").style('width').slice(0,-2)  ,(event_y  - c.getBoundingClientRect().y) *$("#myCanvas").attr('width') / d3.select("#myCanvas").style('width').slice(0,-2) ])
+      }
+    }
+
+    function up() {
+      is_drawing = 0;
+      redraw()
+      console.log(pts);
+    }
+
+    d3.select("canvas").on("mousedown", down);
+    d3.select("canvas").on("touchstart", function () { d3.event.preventDefault(); down()});
+
+    d3.select('canvas').on("mousemove", function () {d3.event.preventDefault(); move()});
+    d3.select('canvas').on("touchmove", move);
+
+    d3.select("canvas").on("mouseup", up);
+    d3.select("canvas").on("touchend", function () {d3.event.preventDefault(); up()});
+
+    function redraw() {
+      ctx.clearRect(0,0,canvas.width,canvas.height)
+      ctx.drawImage(saveCanvas,0,0)
+      //ctx.clearRect(0,0,c.width,c.height)
+      ctx.beginPath();
+      ctx.lineWidth="5";
+      ctx.strokeStyle="red"; // Green path
+      if (pts.length > 0) {
+        ctx.moveTo(pts[0][0],pts[0][1]);
+        for(i=0;i<pts.length -1 ;i++)
+        {
+
+          ctx.lineTo(pts[i+1][0],pts[i+1][1]);
+        }
+        ctx.stroke(); // Draw it
+      }
+    }
+
+});
+
+$("#capture").find('.screenShotTempCanvas').remove();
+$("#capture").find('.tempHide').show().removeClass('tempHide');
+
+}
+
+/*
+
+if (dd.length > 18) {
+// from Stack Overflow
+var ticks = d3.selectAll(".axis--x .tick")
+ticks.attr("disabled", function(d,i){
+      if(i%2 != 0) d3.select(this).remove();
+  });
+} */
+
+function draw_initial_x_components(data) {
+x.domain(data.map(function (d,i) {return d.letter}))
+old_x.domain(data.map(function (d,i) {return d.letter}))
+
+
+g.selectAll(".bar")
+  .data(dd, function(d) { return d.letter; })
+//    .enter().append("rect").filter(function(d) { if (+d.letter > 2003) {return true;} })
+    .enter().append("rect")
+    .attr("class", "bar")
+    .attr("x", function(d) { return x(d.letter); })
+    .attr("width", x.bandwidth()).style("fill","steelblue")
+
+    g.append("rect").attr("class","hider").attr("width",svg.attr("width")).attr("height",svg.attr("height")).attr("x",0).attr("y",height + 2 ).style("fill","white");
+
+  g.append("g")
+    .attr("class", "axis axis--x")
+    .attr("transform", "translate(0," + height + ")")
+    .transition()
+    .call(d3.axisBottom(x));
+
+    if (x.domain().length > 18) {
+      // from Stack Overflow
+      var ticks = d3.selectAll(".axis--x .tick")
+      ticks.attr("disabled", function(d,i){
+            if(i%2 != 0) d3.select(this).remove();
+        });
+    }
+
+}
+
+
+function draw_x_components(data,domain_filtr,bars_filtr) {
+
+if (domain_filtr == undefined) {
+  domain_filtr = function (d) {return d.letter;}
+}
+
+if (bars_filtr == undefined) {
+  bars_filtr = function () {return true}
+}
+
+
+x.domain(data.map(domain_filtr))
+
+// Do initial x-axis + bar creation
+
+/*
+g.selectAll(".bar")
+.data(dd)
+.enter()
+.filter(function (d) {if (x(d.letter) == undefined) {return 0} else {return 1}})
+.raise()
+*/
+
+g.selectAll(".bar")
+    .transition(501)
+    .attr("x", function(d) { if (x(d.letter)) {return x(d.letter);} else { return old_x(d.letter);} })
+    //.attr()
+    .attr("width", function(d) {if (x(d.letter)) {return x.bandwidth()} else{return old_x.bandwidth()}})
+
+g.selectAll(".hider").remove()
+    g.append("rect").attr("class","hider").attr("width",svg.attr("width")).attr("height",svg.attr("height")).attr("x",0).attr("y",height + 2).style("fill","white");
+
+p = $(".axis--x").parent()
+ax_node = $(".axis--x").detach()
+p.append(ax_node)
+
+svg.select(".axis--x")
+    .transition(500)
+    .call(d3.axisBottom(x));
+
+old_x.domain(data.map(domain_filtr))
+}
+
+function redraw_x(data,domain_filtr,bars_filtr) {
+draw_x_components(data,domain_filtr,bars_filtr)
+drawChart("frequency",titles["Default"])
+if (x.domain().length > 18) {
+  // from Stack Overflow
+  var ticks = d3.selectAll(".axis--x .tick")
+  ticks.attr("disabled", function(d,i){
+        if(i%2 != 0) d3.select(this).remove();
+    });
+}
+}
+
+// setup keyboard and mouse listeners
+
+d3.selectAll(".transform-button").on("mousedown", function() {
+     do_glimpse();
+});
+
+d3.selectAll(".transform-button").on("mouseup", function() {
+  clear();
+});
+
+d3.selectAll(".transform-button").on("touchstart", function() {
+     do_glimpse();
+});
+
+d3.selectAll(".transform-button").on("touchend", function() {
+     clear();
+});
+
+
+function reorder_nodes(filter_func) {
+var elems3d = $(".bar");
+var elemsRemoved = [];
+var a = $(".bar").parent()
+// removing
+elems3d.each(function(i,o) {
+   var elem = $(o);
+   elemsRemoved.push(
+       elem.detach()
+   );
+});
+
+indices=[]
+dd.map(filter_func).forEach(function (d,index) {if(d) {indices.push(dd[index].letter)}})
+top_elems = []
+other_elems = []
+elemsRemoved.forEach(function (d,index) {
+    if (indices.indexOf(d.attr("id")) > -1){
+      top_elems.push(d)
+    }
+    else {
+      other_elems.push(d)
+    }
+})
+
+// adding back
+
+while (other_elems.length) {
+   var elem = other_elems.pop();
+   a.append(elem);
+}
+while (top_elems.length) {
+   var elem = top_elems.pop();
+   a.append(elem);
+}
+}
+
+
+var filter_list = [2001,2006];
+
+function do_filter() {
+
+function filter_domain_filter(d) {
+  letter = d.letter
+  if ( ! isNaN(+(d.letter))) {letter = +letter}
+  if (filter_list.indexOf(letter) >= 0)
+  {
+    return d.letter;
+  }
+  else {
+
+    return filter_list[0];
+  }
+}
+
+function filter_bars_filter(d) {
+  letter = d.letter
+  if ( ! isNaN(+(d.letter))) {letter = +letter}
+  if (filter_list.indexOf(letter) >= 0)
+  {
+      return true;
+  }
+}
+  reorder_nodes(filter_bars_filter)
+  redraw_x(dd,filter_domain_filter,filter_bars_filter);
+
+  svg.selectAll(".bar").filter(function (d,i) {
+                                letter = d.letter;
+                                if ( ! isNaN(+(d.letter))) {letter = +letter}
+                                return filter_list.indexOf(letter) >= 0})
+                       .style("fill","orange");
+}
+
+
+
+function do_zoom() {
+remove_line();
+zoom_years.sort()
+function zoom_domain_filter(d) {
+  if (zoom_func(d))
+  {
+    return d.letter;
+  }
+  else {
+    //console.log(d);
+    if (x(zoom_years[0]) < x(zoom_years[1])) {
+        return zoom_years[0];
+    }
+    else {
+      return zoom_years[1];
+    }
+
+  }
+}
+
+function zoom_bars_filter(d) {
+  if (zoom_func(d))
+  {
+      return true;
+  }
+}
+  reorder_nodes(zoom_bars_filter)
+  redraw_x(dd,zoom_domain_filter,zoom_bars_filter);
+  svg.selectAll(".bar").filter(zoom_func).style("fill","orange");
+
+}
+
+
+function do_fold() {
+remove_line();
+function fold_domain_filter(d) {
+  if (fold_display_func(d,i))
+  {
+    return d.letter;
+  }
+  else {
+    return fold_years[0];
+  }
+}
+
+function fold_bars_filter(d) {
+  if (fold_display_func(d,i))
+  {
+      return true;
+  }
+}
+reorder_nodes(fold_bars_filter)
+  redraw_x(dd,fold_domain_filter,fold_bars_filter);
+
+svg.selectAll(".bar").filter(fold_highlight_func).style("fill","orange");
+
+}
+
+
+function animate_axis_cut() {
+svg.selectAll(".axisline").transition(500).attr("transform", "translate(0," + y(cut_val) + ")");
+}
+
+function animate_trendline(backward) {
+if (backward == undefined) {
+  svg.selectAll("line.trendline").transition(500).attr("y1",y(0)).attr("y2",y(0));
+  svg.selectAll("line.dashline").transition(500).attr("y1",y(0)).attr("y2",y(0));
+  svg.selectAll("g > circle").transition(500).attr("cy",y(0) + 20);
+}
+else {
+ svg.selectAll("line.trendline").transition(500).attr("y1",min_y).attr("y2",max_y);
+ svg.selectAll("g.startpoint > circle").transition(500).attr("cy",min_y + 20)
+ svg.selectAll("g.endpoint > circle").transition(500).attr("cy",max_y  +  20)
+
+ svg.selectAll("line.dashline.left").transition(500).attr("y1",min_y).attr("y2",b);
+ svg.selectAll("line.dashline.right").transition(500).attr("y1",max_y).attr("y2",960 * slope + b);
+}
+
+}
+
+
+function do_glimpse() {
+id = $(".last-clicked").attr("id")
+
+
+
+switch(id) {
+  case "log": drawChart("log",titles["log"]); break;
+  case "cum": drawChart("cum", titles["Cum"] ); break;
+  case "diff": drawChart("diff", titles["Diff"]); break;
+  case "renormalize": drawChart("ren", titles["Renormalize"]+ renormalize_year); break;
+  case "trendline": do_trendline_deviation(); animate_trendline(); break;
+  case "cut": drawChart("frequency", titles["Cut"] + cut_val,true); animate_axis_cut(); break;
+  case "zoom": do_zoom(); break;
+  case "filter": do_filter(); break;
+  case "fold": do_fold(); break;
+}
+}
+
+function append_point(point,cx,cy) {
+g.append("g")
+      .attr("class", point)
+      .attr("transform", "translate(-40,-20)")
+      .append("circle")
+      .attr("cx",cx)
+      .attr("cy",cy)
+      .attr("class","marker")
+      .call(update_trendline);
+}
+
+// add listeners to detect click events
+
+function trendlineClickListener (point) {
+function listener(d,i) {
+    d3.event.preventDefault();
+
+    var coords = d3.mouse(this);
+
+    svg.selectAll("g." + point).remove()
+
+    append_point(point,d3.mouse(this)[0],d3.mouse(this)[1])
+}
+return listener;
+}
+
+
+function filterClickListener(d,i) {
+
+ letter = d.letter
+ if ( ! isNaN(+(d.letter))) {letter = +letter}
+ idx = filter_list.indexOf(letter);
+ if( idx >= 0) {
+  if (filter_list.length > 1) {
+    filter_list.splice(idx,1)
+    svg.selectAll(".bar").filter(function (x,i) {return letter == x.letter}).style("fill","steelblue");
+  }
+ }
+ else {
+    filter_list.push(letter);
+    svg.selectAll(".bar").filter(function (x,i) {return letter == x.letter}).style("fill","orange");
+  }
+filter_list.sort(function(a, b){return x(a)-x(b)})
+}
+
+
+function renormalizeClickListener(d,i) {
+renormalize_year = d.letter;
+svg.selectAll(".bar").filter(function (d,i) {return d.letter == renormalize_year}).style("fill","orange");
+svg.selectAll(".bar").filter(function (d,i) {return d.letter != renormalize_year}).style("fill","steelblue");
+for (i=0;i<dd.length;i++)
+{
+    dd[i]["ren"] =dd[i]["frequency"] - d["frequency"]
+}
+}
+
+// cut_val is a global defined above, initialized to 0
+function cutClickListener(d,i) {
+cut_val = +d
+update_cut_axis_line()
+}
+
+var fold_clicks = 0;
+var fold_years = [2001,2007]
+function foldClickListener(d,i) {
+fold_years[fold_clicks%2] = +d;
+fold_years.sort(function(a, b){return a-b});
+fold_clicks+=1;
+
+update_x_axis_underline("foldline",x(fold_years[0]) + x.bandwidth()/2, x(fold_years[1]) + x.bandwidth()/2)
+svg.selectAll(".bar").filter(fold_highlight_func).style("fill","orange");
+svg.selectAll(".bar").filter(function (d,i) {return ! fold_highlight_func(d,i) }).style("fill","steelblue");
+}
+
+var zoom_clicks = 0;
+var zoom_years = [2002,2005];
+function zoomClickListener(d,i) {
+zoom_years[zoom_clicks%2] = +d;
+
+//zoom_years[0] = +zoom_years[0]
+//zoom_years[1] = +zoom_years[1]
+
+zoom_years.sort(function(a, b){return x(a)-x(b) });
+zoom_clicks+=1;
+
+update_x_axis_underline("zoomline",x(zoom_years[0]) + x.bandwidth()/2, x(zoom_years[1]) + x.bandwidth()/2);
+svg.selectAll(".bar").filter(zoom_func).style("fill","orange");
+svg.selectAll(".bar").filter(function (d,i) {return ! zoom_func(d,i)}).style("fill","steelblue");
+}
+
+function clear_click_listeners() {
+svg.on("click", null).on("touchstart",null);
+svg.on("contextmenu", null).on("touchstart",null);
+svg.selectAll(".bar").on("click",null).on("touchstart",null);
+}
+
+
+var closer;
+
+function lineDragStartListener (array) {
+closer = +(Math.abs(x(array[0]) - d3.event.x)  >  Math.abs(x(array[1]) - d3.event.x))
+console.log(closer)
+}
+
+function lineDraggedListener (array,line,func) {
+  var x_vals = [];
+
+  d3.map(x.domain(),function(d){x_vals.push(Math.abs(x(d) - d3.event.x))})
+
+  var m = d3.min(x_vals)
+
+  console.log(x.domain()[x_vals.indexOf(m)])
+
+  if (array[closer] != x.domain()[x_vals.indexOf(m)]){
+    array[closer] = x.domain()[x_vals.indexOf(m)];
+    if (+(array[closer]))
+    {
+        array[closer] = + array[closer]
+    }
+    update_x_axis_underline(line,x(array[0]) + x.bandwidth()/2, x(array[1]) + x.bandwidth()/2);
+
+    svg.selectAll(".bar").filter(func).style("fill","orange");
+    svg.selectAll(".bar").filter(function (d,i) {return ! func(d,i)}).style("fill","steelblue");
+  }
+  //array.sort()
+
+}
+
+function pointDraggedListener(d){
+
+var x_vals = [];
+
+d3.map(x.domain(),function(d){x_vals.push(Math.abs(x(d) - d3.event.x +  x.bandwidth() / 2 + 40))})
+
+var m = d3.min(x_vals)
+
+console.log(x.domain()[x_vals.indexOf(m)])
+
+d3.select(this).attr("cx", x(x.domain()[x_vals.indexOf(m)]) + x.bandwidth() / 2 + 40).attr("cy", d3.event.y);
+update_trendline();
+}
+
+
+function set_click_listeners(id) {
+
+clear_click_listeners()
+switch(id) {
+  case "trendline":
+    //svg.on("click", trendlineClickListener("startpoint"));
+    //svg.on("contextmenu", trendlineClickListener("endpoint"));
+    svg.selectAll("g.endpoint > circle").call(d3.drag().on("drag", pointDraggedListener));
+    svg.selectAll("g.startpoint > circle").call(d3.drag().on("drag", pointDraggedListener));
+    break;
+  case "renormalize":
+    svg.selectAll(".bar").on("click", renormalizeClickListener).on("touchstart", renormalizeClickListener);
+    break;
+  case "cut":
+    svg.selectAll(".axis--y > .tick").on("click", cutClickListener).on("touchstart", cutClickListener);
+    break;
+  case "zoom":
+    svg.selectAll(".axis--x > .tick").on("click", zoomClickListener).on("touchstart", zoomClickListener);
+    break;
+  case "fold":
+    svg.selectAll(".axis--x > .tick").on("click", foldClickListener).on("touchstart", foldClickListener);
+    break;
+  case "filter":
+    svg.selectAll(".bar").on("click", filterClickListener).on("touchstart", function(d,i) {svg.selectAll(".bar").on("click", null); filterClickListener(d,i);})
+    break;
+}
+
+}
+
+function update_x_axis_underline (line_type,x1,x2) {
+// line_type == "zoomline"
+svg.selectAll("." + line_type).remove()
+svg.selectAll(".marker").remove()
+
+g.append("line")
+  .attr("class",line_type)
+  .attr("x1",x1)
+  .attr("y1",height + 40)
+  .attr("x2",x2)
+  .attr("y2",height + 40)
+  .attr("stroke","orange")
+  .attr("stroke-width","20px");
+
+  g.append("circle").attr("class","marker").attr("cx",x1).attr("cy",height + 40).attr("fill","orange").attr("r",20)
+  g.append("circle").attr("class","marker").attr("cx",x2).attr("cy",height + 40).attr("fill","orange").attr("r",20)
+
+
+  if (line_type == "zoomline") {
+    svg.selectAll(".zoomline").call(d3.drag().on("start", function(){lineDragStartListener(zoom_years)}).on("drag", function(){lineDraggedListener(zoom_years,"zoomline",zoom_func)}));
+    svg.selectAll(".marker").call(d3.drag().on("start", function(){lineDragStartListener(zoom_years)}).on("drag", function(){lineDraggedListener(zoom_years,"zoomline",zoom_func)}));
+  }
+  else {
+    svg.selectAll(".foldline").call(d3.drag().on("start", function(){lineDragStartListener(fold_years)}).on("drag", function(){lineDraggedListener(fold_years,"foldline",fold_highlight_func)}));
+    svg.selectAll(".marker").call(d3.drag().on("start", function(){lineDragStartListener(fold_years)}).on("drag", function(){lineDraggedListener(fold_years,"foldline",fold_highlight_func)}));
+  }
+}
+
+
+function axislineDraggedListener(d) {
+
+let v = Math.max(+y.invert(d3.event.y - 60),d3.min(y.domain()))
+d3.selectAll(".axisline").attr("transform",  "translate(0," + y(v) + ")" );
+if (v.toPrecision(3).indexOf("e") > -1){
+  cut_val = (v).toPrecision(3).slice(0,4) * 10 ** (v).toPrecision(3).slice(6,)
+}
+else {
+  cut_val = +(+v).toPrecision(3)
+}
+console.log(d3.event.y)
+}
+
+function update_cut_axis_line () {
+// line_type == "zoomline"
+svg.selectAll(".axisline").remove()
+
+ax = g.append("g")
+  .attr("class","axisline")
+  .attr("transform", "translate(0," + y(cut_val) + ")");
+ax.append("line")
+  .attr("x1",1)
+  .attr("y1",0)
+  .attr("x2",960)
+  .attr("y2",0)
+  .attr("stroke","orange")
+  .attr("stroke-width","5px");
+svg.call(d3.drag().on("drag", axislineDraggedListener));
+
+ax.append("polygon").attr("points", "1,15  15,1 1,-15").style("fill","orange");
+ax.append("polygon").attr("points", "870,15  854,0 870,-15").style("fill","orange");
+}
+
+
+var min_x = 35, min_y = 200, max_x = 850, max_y = 20;
+function update_trendline() {
+svg.selectAll("line.trendline").remove();
+svg.selectAll("line.dashline").remove();
+
+// try adding the startpoints if they are not there
+// but a previous update_trendline call has stored vals in min_x, min_y, etc.
+if (svg.select("g.startpoint").empty() && svg.select("g.endpoint").empty())
+{
+  if (min_x + min_y + max_x + max_y  + 0 != NaN) {
+      append_point("startpoint",min_x + 40,min_y + 20)
+      append_point("endpoint",max_x + 40,max_y + 20);
+      svg.selectAll("g.endpoint > circle").call(d3.drag().on("drag", pointDraggedListener));
+      svg.selectAll("g.startpoint > circle").call(d3.drag().on("drag", pointDraggedListener));
+  }
+}
+
+if (! svg.select("g.startpoint").empty() && ! svg.select("g.endpoint").empty())
+{
+
+    if (+svg.select("g.startpoint > circle").attr("cx") > +svg.select("g.endpoint > circle").attr("cx")) {
+        min_x = +svg.select("g.endpoint > circle").attr("cx") - 40
+        min_y = +svg.select("g.endpoint > circle").attr("cy") - 20
+        max_x = +svg.select("g.startpoint > circle").attr("cx") - 40
+        max_y = +svg.select("g.startpoint > circle").attr("cy") - 20
+    }
+    else {
+        min_x = +svg.select("g.startpoint > circle").attr("cx") - 40
+        min_y = +svg.select("g.startpoint > circle").attr("cy") - 20
+        max_x = +svg.select("g.endpoint > circle").attr("cx") - 40
+        max_y = +svg.select("g.endpoint > circle").attr("cy") - 20
+    }
+
+
+    g.append("line")
+        .attr("class", "trendline")
+        .attr("x1",min_x)
+        .attr("y1",min_y)
+        .attr("x2",max_x)
+        .attr("y2",max_y)
+        .attr("stroke","orange")
+        .attr("stroke-width","5px")
+
+    slope =   (max_y - min_y) / (max_x - min_x);
+
+    b = min_y - slope * min_x;
+
+    g.append("line")
+        .attr("class", "dashline left")
+        .attr("x1",min_x)
+        .attr("y1",min_y)
+        .attr("x2", 0)
+        .attr("y2", b)
+        .attr("stroke","orange")
+        .attr("stroke-dasharray","10,10")
+        .attr("stroke-width","5px")
+
+        g.append("line")
+        .attr("class", "dashline right")
+        .attr("x1",max_x)
+        .attr("y1",max_y)
+        .attr("x2", 960)
+        .attr("y2", slope * 960 + b)
+        .attr("stroke","orange")
+        .attr("stroke-dasharray","10,10")
+        .attr("stroke-width","5px")
+
+
+}
+p = $(".startpoint").parent()
+sp = $(".startpoint").detach()
+ep = $(".endpoint").detach()
+p.append(sp); p.append(ep)
+
+}
+
+function fold_highlight_func(d,i) {return (x(d.letter) == Math.min(x(fold_years[0]),x(fold_years[1])) || (x(d.letter) == Math.max(x(fold_years[0]),x(fold_years[1])))) }
+
+function fold_display_func(d,i) {return (x(d.letter) <= Math.min(x(fold_years[0]),x(fold_years[1])) || (x(d.letter) >= Math.max(x(fold_years[0]),x(fold_years[1])))) }
+
+function zoom_func(d,i) {return(x(d.letter) >= Math.min(x(zoom_years[0]),x(zoom_years[1])) && (x(d.letter) <= Math.max(x(zoom_years[0]),x(zoom_years[1]) )))}
+
+
+function remove_line() {
+svg.selectAll("g.endpoint").remove();
+svg.selectAll("g.startpoint").remove();
+svg.selectAll(".marker").remove();
+svg.selectAll(".axisline").remove();
+svg.selectAll(".trendline").remove();
+svg.selectAll(".zoomline").remove();
+svg.selectAll(".foldline").remove();
+svg.selectAll(".dashline").remove();
+}
+
+function do_trendline_deviation() {
+
+if (svg.select("g.startpoint").empty() || svg.select("g.endpoint").empty()) {
+  return;
+}
+
+for (i=0;i<dd.length;i++)
+{
+  line_height = (max_y - min_y) * (x(dd[i].letter) + x.bandwidth() / 2 - min_x) / (max_x - min_x) + min_y;
+  console.log(line_height)
+  console.log(y(dd[i].frequency))
+  dd[i]["dev"] = dd[i].frequency - y.invert(line_height)  ;
+}
+
+//  remove_line()
+
+drawChart("dev","Deviation from Trend Line")
+}
+
+function clear() {
+
+ drawChart("frequency",titles["Default"]);
+
+ if ($(".last-clicked").attr("id") == "trendline") {
+  //update_trendline();
+  animate_trendline(true);
+ }
+ else if  ($(".last-clicked").attr("id") == "cut"){
+  animate_axis_cut();
+ }
+ else {
+  remove_line() ;
+ }
+
+if ($(".last-clicked").attr("id") == "filter") {
+  redraw_x(dd);
+  svg.selectAll(".bar").filter(function (d,i) {return (filter_list.indexOf(+d.letter)  >= 0) || (filter_list.indexOf(d.letter)  >= 0)}).style("fill","orange");
+ }
+
+if ($(".last-clicked").attr("id") == "zoom") {
+  redraw_x(dd);
+  update_x_axis_underline("zoomline",x(zoom_years[0]) + x.bandwidth()/2, x(zoom_years[1]) + x.bandwidth()/2)
+  svg.selectAll(".bar").filter(zoom_func).style("fill","orange");
+ }
+
+if ($(".last-clicked").attr("id") == "fold") {
+  redraw_x(dd);
+  update_x_axis_underline("foldline",x(fold_years[0]) + x.bandwidth()/2, x(fold_years[1]) + x.bandwidth()/2)
+  svg.selectAll(".bar").filter(fold_highlight_func).style("fill","orange");
+
+ }
+
+
+set_click_listeners($(".last-clicked").attr("id"));
+
+
+}
+
+function update_title(title_txt,label_txt)
+{
+$(".title").text(title_txt);
+if (label_txt != undefined) {
+  $(".ylabel").text(label_txt);
+}
+}
+
+var question_vals = []
+var answer_vals = []
+var screenshots = []
+var k = 0;
+
+
+function advance() {
+
+let question_val = question_information[k]["question"] // .replace(/[^\w\s]/gi, '')
+let answer_val = $("#answer").val() // .replace(/[^\w\s]/gi, '')
+
+names = ["question_vals","answer_vals","screenshots"]
+vals = [question_vals,answer_vals,screenshots]
+
+if (true) {//(likert_val && explanation_val) {
+  $('#reminder').show()
+  k = k+1;
+  question_vals.push(question_val); answer_vals.push(answer_val); screenshots.push(screenshot);
+  $("#answer").val("")
+  if (k >= question_information.length)
+  {
+    $("#proceed").attr("disabled","disabled")
+    logging_str += "Total time: "  + (new Date() - session_start_time)/1000 + "s;"
+    localStorage.setItem("logging",logging_str)
+    for (var ii=0;ii<names.length;ii++)
+    {
+      localStorage.setItem(names[ii],JSON.stringify(vals[ii]))
+    }
+    alert("You have successfully completed all the questions")
+    $.ajax
+   ({
+       type: "POST",
+       url: 'https://in-lab-experiment.herokuapp.com/save_vis_app/',
+       dataType: 'json',
+       contentType: 'application/json',
+       async: false,
+       data: JSON.stringify(localStorage)
+   })
+
+  }
+  else {
+    logging_str += "Advance: "  + (new Date() - session_start_time)/1000 + "s;"
+    $("#question").text(question_information[k]["question"])
+      $("button").removeClass("last-clicked");
+      $("button").blur()
+      screenshot = ""
+      $("#proceed").attr("disabled","disabled")
+    if (question_information[k]["view"] != current_view){
+      change_view(question_information[k]["view"])
+    }
+  }
+}
+else {
+      alert("Please answer all questions to proceed.")
+      return;
+}
+}
+
+function screenshot_ok() {
+if (document.getElementById("myCanvas")){
+   screenshot = document.getElementById("myCanvas").toDataURL();
+   $("canvas").remove();
+   $('#exampleModal').modal('hide')
+   $('#reminder').hide()
+   $("#proceed").attr("disabled",null)
+   clear()
+}
+}
+
+function screenshot_not_ok() {
+if (document.getElementById("myCanvas")){
+   $("canvas").remove();
+   $('#exampleModal').modal('hide')
+   clear()
+}
+}
+
+$(".btn-success").on('click',function() {screenshot_ok()})
+$("#proceed").on('click',function() {advance()})
+$(".btn-secondary").on('click',function() {screenshot_not_ok()})
+
+var titles = {
+"Default":"Price of Oil",
+"Y":"USD per Barrel",
+"Renormalize": "Difference from ",
+"Cut": "Oil Prices, Axis cut at ",
+"Trendline":"Deviation from Trendline",
+"Diff":"Year-to-Year Change in Oil Price",
+"Cum":"Cumulative",
+}
+
+zoom_years = [2005,2009]
+fold_years = [2007,2017]
+filter_list = [2010,2012,2014]
+
+
+function change_view(filename) {
+ new_graph(filename)
+
+ if (filename == "data2.tsv") {
+   zoom_years = [2001,2009]
+   fold_years = [2001,2009]
+   filter_list = [2001,2009]
+
+   titles = {
+     "Default":"US Soybean Exports",
+     "Y":"Thousands of Bushels",
+     "Renormalize": "Difference from ",
+     "Cut": "Exports, Axis cut at ",
+     "Trendline":"Deviation from Trendline",
+     "Diff":"Year-to-Year Change in Exports",
+     "Cum":"Cumulative Exports",
+   }
+
+   $("#filter").attr("disabled","disabled").attr("style","background-color:grey")
+
+ }
+ if (filename == "iphone_data.tsv")
+ {
+   zoom_years = ["Q2'14", "Q2'15"]
+   fold_years = ["Q2'14", "Q2'15"]
+   filter_list = ["Q2'14"]
+
+    titles = {
+     "Default":"Quarterly Sales of iPhones Since Launch",
+     "Y":"Millions of Units",
+     "Renormalize": "Difference from ",
+     "Cut": "Exports, Axis cut at ",
+     "Trendline":"Deviation from Trendline",
+     "Diff":"Year-to-Year Change in Sales",
+     "Cum":"Cumulative Sales",
+   }
+
+   $("#filter").attr("disabled","disabled").attr("style","background-color:grey")
+   $("#trendline").attr("disabled","disabled").attr("style","background-color:grey")
+
+ }
+
+ if (filename == "soybean_data.tsv") {
+   fold_years = ["Mexico","Vietnam"]
+   zoom_years = ["Mexico","Vietnam"]
+   filter_list = ["Taiwan","Vietnam"]
+
+    titles = {
+     "Default":"Top Importers of US Soybeans (excluding China)",
+     "Y":"Millions of Metric Tons",
+     "Renormalize": "Difference from ",
+     "Cut": "Exports, Axis cut at ",
+     "Trendline":"Deviation from Trendline",
+   }
+
+   $("#trendline").attr("disabled","disabled").attr("style","background-color:grey")
+
+   $("#filter").attr("disabled",null).attr("style","background-color:steelblue")
+   $("#diff").attr("disabled","disabled").attr("style","background-color:grey")
+   $("#cum").attr("disabled","disabled").attr("style","background-color:grey")
+   $(".title").attr("margin-left","10px")
+ }
+}
+
+
+var screenshot = ""
+var current_view = "soybean_time";
+var question_information = [
+
+{"view":"data2.tsv",
+ "question":"Which year had the highest oil price?",
+},
+{"view":"data2.tsv",
+ "question":"What is the period (in years) of the periodic trend from 2000 to 2008?",
+},
+{"view":"data2.tsv",
+ "question":"Which year deviates the most from the linear trend?",
+},
+{"view":"data2.tsv",
+ "question":"What is the range of sale volumes for the period 2001-2003?",
+},
+{"view":"iphone_data.tsv",
+ "question":"In what year did all-time iPhone sales surpass 500 million?",
+},
+{"view":"iphone_data.tsv",
+ "question":"How many more iPhones were sold in Q2'2012 than in Q2'2008?",
+},
+{"view":"soybean_data.tsv",
+ "question":"Which Asian countries have more than one billion metric tons in soybean imports?",
+},
+{"view":"soybean_data.tsv",
+ "question":"What is the difference in imports between Spain and Mexico?",
+},
+{"view":"soybean_data.tsv",
+ "question":"What is the size of the largest difference between countries?",
+},
+]
+
+d3.select("#question").text(question_information[k]["question"])
+
+//}
+
+</script>
+</html>

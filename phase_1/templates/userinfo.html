@@ -1,0 +1,96 @@
+
+<!-- some of this code reused from Pandey et. al 2015 -->
+<link rel="stylesheet" type="text/css" href="/static/main.css">
+
+<style type="text/css">
+
+
+</style>
+
+<body>
+<div class="container">
+<h1>Demographic Questions</h1>
+<p>In which year were you born?</p>
+<p align="left">
+<input type="text" id="birth_year" placeholder="YYYY">
+</p>
+<p>Select your gender</p>
+<p align="left">
+	<form id="gender">
+      <input type="radio" name="radio1" id="radio1" value="Male">
+      <label for="radio">Male </label>
+      <br>
+      <input type="radio" name="radio1" id="radio2" value="Female">
+      <label for="radio2">Female </label>
+      <br>
+      <input type="radio" name="radio1" id="radio3" value="Other">
+      <label for="radio3">Other</label>
+      <input type="text"  id="specify" placeholder="Please Specify">
+      <br>
+      <input type="radio" name="radio1" id="radio4" value="Prefer not to answer">
+      <label for="radio4">Prefer not to answer</label>
+  	</form>
+    </p>
+
+<p>Please enter your program and year of study</p>
+<p align="left">
+	<input id="education" type="text" style="width:350px" placeholder="B.A.Sc. Chemical Engineering, Year 3"></input>
+</p>
+
+
+
+
+</p>
+<input type="submit" value="Proceed" onclick="advance()"></input>
+
+<div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script type="text/javascript">
+ var session_start_time = new Date()
+
+  function advance() {
+    	var end_time = new Date()
+    	localStorage.setItem("userinfo_time", (end_time - session_start_time)/1000 + "s")
+    	let birth_year = $('#birth_year').val()
+		if (birth_year) {
+			if (isNaN(birth_year) ||  birth_year.toString().length != 4)
+			{
+				alert("Birth year is not a valid 4-digit number");
+				return;
+			}
+
+			localStorage.setItem("birth_year",birth_year);
+		}
+		else {
+			localStorage.setItem("birth_year","NoAnswer");
+
+		}
+
+		let education = $('#education').val()
+		if (education) {
+			localStorage.setItem("education",education);
+		}
+		else {
+			localStorage.setItem("education","NoAnswer");
+
+		}
+
+		let gender = $('#gender > input:checked').val()
+		if (gender) {
+			if (gender == "Other") {
+				gender = gender + "(" + $("#specify").val() + ")"
+			}
+			localStorage.setItem("gender",gender);
+		}
+		else {
+			localStorage.setItem("gender","NoAnswer");
+		}
+
+
+		// if it gets to this point they have answered all the mandatory questions / birth year is in proper format.
+		window.location.href = "demo"
+
+
+
+	}
+</script>

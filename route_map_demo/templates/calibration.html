@@ -1,0 +1,69 @@
+
+<link rel="stylesheet" type="text/css" href="/static/main.css">
+
+<style type="text/css">
+
+polyline {
+		fill:none;
+		stroke: red;
+		stroke-width:10px;
+}
+
+.centered-container {
+text-align: center;
+}
+
+.title {
+font-size: 20px;
+padding: 0px;
+margin-bottom: 5px;
+font-family: sans-serif;
+
+}
+
+.rectangle {
+	border:4px dotted red;
+	width:500px;
+	margin: auto;
+	min-height: 340px;
+}
+
+img {
+	padding-top:10px;
+	width:80%;
+	margin:auto;
+	display: block;
+}
+
+  </style>
+<!-- calibration instructions modified from -->
+
+<div class="container">
+<div class="centered-container">
+    <p class="title">Please adjust your screen until the red rectangle is fully in view.</p>
+    <div  class="rectangle">
+    	<img src="/static/computers.png">
+
+<p><b>To zoom in/out</b></p>
+
+<p>Shortcut on Mac: command + '+'/'-'  </p>
+<p>Shortcut on Windows: Ctrl + '+'/'-'  </p>
+
+<p>Detailed help page <a href="http://learnhowtozoom.com/"> http://learnhowtozoom.com/</a> </p>
+
+    </div>
+    <br>
+<input type="submit" onclick="advance()" value="Proceed"></input>
+
+  </div>
+  <br>
+  <script type="text/javascript">
+
+		var session_start_time = new Date()
+		function advance() {
+			var end_time = new Date()
+   			localStorage.setItem("calibration_time", (end_time - session_start_time)/1000 + "s")
+			window.location.href = "../userinfo";
+		}  				
+
+  </script>

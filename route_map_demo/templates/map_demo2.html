@@ -1,0 +1,646 @@
+
+<!-- adapted from https://bl.ocks.org/mbostock/899711#stations.json -->
+<!-- (GPLv3) -->
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+<style>
+
+html, body, #map {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.stations {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 10000001;
+}
+
+.stations svg.marker {
+  position: absolute;
+  width: 100px;
+  height: 20px;
+  padding-right: 100px;
+  font: 10px sans-serif;
+}
+
+.stations svg.route {
+  position: absolute;
+  z-index: 10000001;
+}
+
+.stations circle {
+  fill: brown;
+  stroke: black;
+  stroke-width: 1.5px;
+}
+
+.cover {
+  position: absolute;
+  width: 20000px;
+  height: 20000px;
+  top: -2000px;
+  left: -2000px;
+  background-color: #1d263c;
+  opacity: 0;
+}
+
+</style>
+<div id="map"></div>
+<script src="//maps.google.com/maps/api/js?sensor=true&key=AIzaSyDgSi0f71fnNvB8eDIPMy4WvbkDJpi2ILQ"></script>
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script src="/static/map_obj.js"></script>
+<script src="/static/transformed.js"></script>
+
+<script>
+
+
+var myStyle = [
+       {
+         featureType: "administrative",
+         elementType: "labels",
+         stylers: [
+           { visibility: "off" }
+         ]
+       },{
+         featureType: "poi",
+         elementType: "labels",
+         stylers: [
+           { visibility: "off" }
+         ]
+       },{
+         featureType: "water",
+         elementType: "labels",
+         stylers: [
+           { visibility: "off" }
+         ]
+       },{
+         featureType: "road",
+         elementType: "labels",
+         stylers: [
+           { visibility: "off" }
+         ]
+       }
+     ];
+
+var myStyle2 = [
+  {
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#242f3e"
+      }
+    ]
+  },
+  {
+    "elementType": "labels",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#746855"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#242f3e"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.locality",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#d59563"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.neighborhood",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#d59563"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#263c3f"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#6b9a76"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#38414e"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#212a37"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "labels.icon",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#9ca5b3"
+      }
+    ]
+  },
+  {
+    "featureType": "road.arterial",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#746855"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry.stroke",
+    "stylers": [
+      {
+        "color": "#1f2835"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "labels",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#f3d19c"
+      }
+    ]
+  },
+  {
+    "featureType": "road.local",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "transit",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "transit",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#2f3948"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.station",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#d59563"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#17263c"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#515c6d"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#17263c"
+      }
+    ]
+  }
+]
+
+
+// Create the Google Map…
+var map = new google.maps.Map(d3.select("#map").node(), {
+  zoom: 11,
+  center: new google.maps.LatLng(34.16011, -118.46972),
+  mapTypeId: 'myStyle',
+  disableDefaultUI: false,
+  draggable: true,
+
+});
+
+     map.mapTypes.set('myStyle', new google.maps.StyledMapType(myStyle2, { name: 'My Style' }));
+
+var dd
+var projection;
+// Load the station data. When the data comes back, create an overlay.
+d3.json("/static/stations.json", function(error, data) {
+  if (error) throw error;
+  dd  = data;
+  var overlay = new google.maps.OverlayView();
+
+  // Add the container when the overlay is added to the map.
+  overlay.onAdd = function() {
+    var layer = d3.select(this.getPanes().overlayLayer).append("div")
+        .attr("class", "stations").attr("height","100%").attr("width","100%");
+
+     function transform(d) {
+        d = new google.maps.LatLng(d.value[0], d.value[1]);
+        d = projection.fromLatLngToDivPixel(d);
+        return d3.select(this)
+            .style("left", (d.x - padding) + "px")
+            .style("top", (d.y - padding) + "px");
+      }
+
+      function deform_route(input, add) {
+        pts = input
+
+        if (add == true) {
+
+         var marker = layer.selectAll("svg.marker")
+            .data(d3.entries(dd))
+            .each(transform) // update existing markers
+          .enter().append("svg")
+            .each(transform)
+            .attr("class", "marker");
+
+        // Add a label.
+        marker.append("text")
+            .attr("x", padding + 7)
+            .attr("y", padding)
+            .attr("dy", ".31em")
+            .text(function(d) { return d.key; });
+
+        }
+        else {
+            layer.selectAll("svg.marker").remove()
+        }
+
+
+        points = d3.entries(pts).map( function(d) {
+          d =  new google.maps.LatLng(d.value[1],d.value[0]);
+          d = projection.fromLatLngToDivPixel(d);
+          return (d.x) + "," +  (d.y)
+        })
+
+
+
+
+        split_points = points.map( d => d.split(",").map(d => +d))
+
+        for (i=0;i<split_points.length;i++)
+        {
+          split_points[i] = {0:(  split_points[i][0] - h_min), 1:  split_points[i][1] - v_min}
+        }
+
+        points = split_points.map(d => d[0] + "," + d[1])
+
+        points = points.join(" ");
+
+        console.log(points)
+        console.log(h_min)
+        console.log(v_min)
+
+        d3.selectAll("polyline.route").transition(500).attr("points",points)
+        d3.selectAll(".street_label").remove()
+
+
+
+        function x_transform(x) {return 8 * x - h_min - 700}
+        function y_transform(y) {return 8 * y - v_min - 600}
+        d3.selectAll("svg.route").append("text").style("fill","green").transition().transition(300).attr("x",x_transform(30)).attr("y",y_transform(86)).attr("class","street_label").text("Paramount Ranch").style("fill","green")
+        d3.selectAll("svg.route").append("text").style("fill","green").transition().transition(300).attr("x",x_transform(31)).attr("y",y_transform(88)).attr("class","street_label").text("National Park").style("fill","green")
+
+
+        d3.selectAll("svg.route").append("text").style("fill","rgba(255,0,0)").transition().transition(300).attr("x",x_transform(118)).attr("y",y_transform(99)).attr("class","street_label").text("Hotel").style("fill","red")
+        d3.selectAll("svg.route").append("text").style("fill","rgba(255,0,0)").transition().transition(300).attr("x",x_transform(117)).attr("y",y_transform(101)).attr("class","street_label").text("Figueroa").style("fill","red")
+
+
+      }
+
+
+
+
+
+    function deform_route_new(input, add) {
+      pts = input
+/*
+      if (add == true) {
+
+       var marker = layer.selectAll("svg.marker")
+          .data(d3.entries(dd))
+          .each(transform) // update existing markers
+        .enter().append("svg")
+          .each(transform)
+          .attr("class", "marker");
+
+      // Add a label.
+      marker.append("text")
+          .attr("x", padding + 7)
+          .attr("y", padding)
+          .attr("dy", ".31em")
+          .text(function(d) { return d.key; });
+
+      }
+      else {
+          layer.selectAll("svg.marker").remove()
+      }
+*/
+/*
+      points = d3.entries(pts).map( function(d) {
+        d =  new google.maps.LatLng(d.value[1],d.value[0]);
+        d = projection.fromLatLngToDivPixel(d);
+        return (d.x) + "," +  (d.y)
+      })
+*/
+      split_points = d3.entries(pts)
+
+
+      //split_points = points.map( d => d.split(",").map(d => +d))
+
+      for (i=0;i<split_points.length;i++)
+      {
+        split_points[i] = {0:( 8 * split_points[i].value[0] - h_min - 700), 1: 8 * split_points[i].value[1] - v_min - 600}
+      }
+
+      points = split_points.map(d => d[0] + "," + d[1])
+
+      points = points.join(" ");
+
+      console.log(points)
+      console.log(h_min)
+      console.log(v_min)
+
+      function x_transform(x) {return 8 * x - h_min - 700}
+      function y_transform(y) {return 8 * y - v_min - 600}
+
+      d3.selectAll("polyline.route").transition(500).attr("points",points)
+      d3.selectAll(".street_label").remove()
+
+      d3.selectAll("svg.route").append("text").style("fill","green").transition().transition(300).attr("x",x_transform(54)).attr("y",y_transform(101)).attr("class","street_label").text("Paramount Ranch").style("fill","green")
+      d3.selectAll("svg.route").append("text").style("fill","green").transition().transition(300).attr("x",x_transform(55)).attr("y",y_transform(103)).attr("class","street_label").text("National Park").style("fill","green")
+
+      d3.selectAll("svg.route").append("text").style("fill","rgba(255,0,0)").transition().transition(300).attr("x",x_transform(108)).attr("y",y_transform(112)).attr("class","street_label").text("Hotel").style("fill","red")
+      d3.selectAll("svg.route").append("text").style("fill","rgba(255,0,0)").transition().transition(300).attr("x",x_transform(107)).attr("y",y_transform(114)).attr("class","street_label").text("Figueroa").style("fill","red")
+
+      d3.selectAll("svg.route").append("text").style("fill","rgba(255,255,255)").transition().transition(300).attr("x",x_transform(75)).attr("y",y_transform(60)).attr("class","street_label").text("US-101 (19.2)").style("fill","white")
+
+      d3.selectAll("svg.route").append("text").style("fill","rgba(255,255,255").transition().transition(300).attr("x",x_transform(48)).attr("y",y_transform(72)).attr("class","street_label").text("Cornell Way (0.1)").style("fill","white")
+
+      d3.selectAll("svg.route").append("text").style("fill","rgba(255,255,255)").attr("x",x_transform(107)).attr("y",y_transform(70)).attr("transform","rotate(45,"+x_transform(107)+"," + y_transform(70) + ")")
+            .transition().transition(500).attr("class","street_label").text("US-101 South (14.1)").style("fill","white")
+
+      d3.selectAll("svg.route").append("text").style("fill","rgba(255,255,255)").attr("x",x_transform(105)).attr("y",y_transform(92)).attr("transform","rotate(-45,"+x_transform(105)+"," + y_transform(92) + ")")
+                  .transition().transition(500).attr("class","street_label").text("CA-110 (1.1)").style("fill","white")
+
+      d3.selectAll("svg.route").append("text").style("fill","rgba(255,255,255)").attr("x",x_transform(54)).attr("y",y_transform(80)).attr("transform","rotate(75,"+x_transform(54)+"," + y_transform(80) + ")")
+                              .transition().transition(500).attr("class","street_label").text("Cornell Rd (2.2)").style("fill","white")
+
+      d3.selectAll("svg.route").append("text").style("fill","rgba(255,255,255)").attr("x",x_transform(43)).attr("y",y_transform(72)).attr("transform","rotate(-90,"+x_transform(43)+"," + y_transform(72) + ")")
+                                                      .transition().transition(500).attr("class","street_label").text("Kaman Rd (0.5)").style("fill","white")
+
+      d3.selectAll("svg.route").append("text").style("fill","rgba(255,255,255)").attr("x",x_transform(105)).attr("y",y_transform(125)).attr("transform","rotate(-60,"+x_transform(105)+"," + y_transform(125) + ")")
+                                                      .transition().transition(500).attr("class","street_label").text("S Figueroa St (0.1)").style("fill","white")
+
+      d3.selectAll("svg.route").append("text").style("fill","rgba(255,255,255)").attr("x",x_transform(119)).attr("y",y_transform(122)).attr("transform","rotate(-63,"+x_transform(119)+"," + y_transform(122) + ")")
+                  .transition().transition(500).attr("class","street_label").text("Flower Street (0.2)").style("fill","white")
+
+      d3.selectAll("svg.route").append("text").style("fill","rgba(255,255,255)").attr("x",x_transform(110)).attr("y",y_transform(120)).attr("transform","rotate(35,"+x_transform(110)+"," + y_transform(120) + ")")
+                  .transition().transition(500).attr("class","street_label").text("Olympic Blvd (0.1)").style("fill","white")
+
+      d3.selectAll("svg.route").append("text").style("fill","rgba(255,255,255)").attr("x",x_transform(116)).attr("y",y_transform(108)).attr("transform","rotate(16,"+x_transform(116)+"," + y_transform(108) + ")")
+                  .transition().transition(500).attr("class","street_label").text("9th St (0.1)").style("fill","white")
+
+      d3.selectAll("svg.route").append("text").style("fill","rgba(255,255,255)").attr("x",x_transform(103)).attr("y",y_transform(103)).attr("transform","rotate(30,"+x_transform(103)+"," + y_transform(103) + ")")
+                              .transition().transition(500).attr("class","street_label").text("James M Wood Blvd(0.2)").style("fill","white")
+
+                              d3.selectAll("svg.route").append("text").style("fill","rgba(255,255,255)").attr("x",x_transform(102)).attr("y",y_transform(97)).attr("transform","rotate(45,"+x_transform(102)+"," + y_transform(97) + ")")
+                              .transition().transition(500).attr("class","street_label").text("8th Place(0.2)").style("fill","white")
+
+    }
+
+
+
+    // Draw each marker as a separate SVG element.
+    // We could use a single SVG, but what size would it have?
+    overlay.draw = function() {
+      projection = this.getProjection(),
+          padding = 10;
+
+      svg = layer.selectAll("svg");
+
+     points = d3.entries(transformed_obj).map( function(d) {
+        d =  new google.maps.LatLng(d.value[1],d.value[0]);
+        d = projection.fromLatLngToDivPixel(d);
+        return (d.x) + "," +  (d.y)
+      })
+
+      split_points = points.map( d => d.split(",").map(d => +d))
+
+      h_min = d3.min(split_points, ((a) => a[0]))
+      h_max = d3.max(split_points, ((a) => a[0]))
+
+      v_min = d3.min(split_points, ((a) => a[1]))
+      v_max = d3.max(split_points, ((a) => a[1]))
+
+
+      points = d3.entries(map_obj).map( function(d) {
+        d =  new google.maps.LatLng(d.value[1],d.value[0]);
+        d = projection.fromLatLngToDivPixel(d);
+        return (d.x) + "," +  (d.y)
+      })
+
+      split_points = points.map( d => d.split(",").map(d => +d))
+
+      h_min = Math.min(h_min,d3.min(split_points, ((a) => a[0])))
+      h_max = Math.max(h_max,d3.max(split_points, ((a) => a[0])))
+
+      v_min = Math.min(v_min,d3.min(split_points, ((a) => a[1])))
+      v_max = Math.max(v_max,d3.max(split_points, ((a) => a[1]))) + 1000
+
+      for (i=0;i<split_points.length;i++)
+      {
+        split_points[i] = {0:split_points[i][0] - h_min, 1: split_points[i][1] - v_min}
+      }
+
+      points = split_points.map(d => d[0] + "," + d[1])
+
+      points = points.join(" ");
+
+    //d3.select(".stations").data({"p":points}).enter().append('polyline').attr("id","route").attr("points",(d) => d.points)
+    d3.selectAll(".route").remove()
+    route_svg = d3.select(".stations").append("svg").attr("class","route").style("top",v_min + "px").style("left",h_min + "px").style("height",v_max - v_min + "px").style("width",h_max - h_min + "px")
+
+    route_svg.append('polyline').attr("class","route").attr("points",points).attr("style","fill:none;stroke:#ECD540;stroke-width:2.5")
+
+     d3.selectAll(".cover").remove()
+     d3.select(d3.select(".stations").node().parentNode.parentNode).append("div").attr("class","cover")
+     d3.select(d3.select(".stations").node().parentNode).attr("z-index","10000001")
+
+
+             function x_transform(x) {return 8 * x - h_min - 700}
+             function y_transform(y) {return 8 * y - v_min - 600}
+
+             d3.selectAll("svg.route").append("text").style("fill","green").transition().transition(300).attr("x",x_transform(30)).attr("y",y_transform(86)).attr("class","street_label").text("Paramount Ranch").style("fill","green")
+             d3.selectAll("svg.route").append("text").style("fill","green").transition().transition(300).attr("x",x_transform(31)).attr("y",y_transform(88)).attr("class","street_label").text("National Park").style("fill","green")
+
+             d3.selectAll("svg.route").append("text").style("fill","rgba(255,0,0)").transition().transition(300).attr("x",x_transform(118)).attr("y",y_transform(99)).attr("class","street_label").text("Hotel").style("fill","red")
+             d3.selectAll("svg.route").append("text").style("fill","rgba(255,0,0)").transition().transition(300).attr("x",x_transform(117)).attr("y",y_transform(101)).attr("class","street_label").text("Figueroa").style("fill","red")
+
+
+
+
+    d3.selectAll("#map").on("mousedown", function () {
+        add_cover("0.9");
+        deform_route_new(transformed_obj,true);
+    });
+
+    d3.selectAll("#map").on("touchdown", function () {
+        add_cover("0.9");
+        deform_route_new(transformed_obj,true);
+    });
+
+    d3.selectAll("#map").on("mouseup", function () {
+        add_cover("0");
+        deform_route(map_obj);
+    });
+
+    d3.selectAll("#map").on("touchup", function () {
+        add_cover("0");
+        deform_route(map_obj);
+    });
+
+
+//    document.getElementsByTagName('svg')[0].style.height = document.getElementsByTagName('g')[0].getBoundingClientRect().height + 'px';
+
+
+
+
+    };
+
+
+
+    function add_cover(final_val) {
+
+      d3.selectAll(".cover").transition(500).style("opacity",final_val);
+    }
+
+
+  };
+
+
+
+  // Bind our overlay to the map…
+  overlay.setMap(map);
+
+  bbox = $("polyline.route").getBBox()
+  d3.selectAll
+});
+
+</script>

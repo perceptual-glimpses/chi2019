@@ -1,0 +1,1119 @@
+
+<link rel="stylesheet" type="text/css" href="../static/main.css">
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+<style type="text/css">
+
+  .bar {
+    fill: rgba(48,99,207,1);
+  }
+
+   button {
+    padding: 0px;
+   }
+
+  .axis--x path {
+    display: none;
+  }
+
+  .marker {
+      r: 8;
+  }
+
+  .endpoint {
+      fill: orange;
+  }
+
+  .startpoint {
+      fill: orange;
+  }
+
+  /* from W3Schools*/
+
+  .axis--y {
+  	transform: translate(400px,0px);
+  }
+
+  .axis--y .domain {
+    stroke: rgba(255,255,255,0);
+  }
+
+  .axis--y .tick text {
+  	font-size: 12px;
+    dx: -0.32em;
+}
+
+
+  .button {
+      background-color: steelblue; /* Green */
+      border: none;
+      color: white;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      visibility: hidden;
+
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+  }
+
+  .button:active {
+    background-color: orange;
+    border: none;
+  }
+
+  .view-button:focus {
+    background-color: orange;
+    border: none;
+  }
+
+  .last-clicked {
+    background-color: orange;
+  }
+
+  .transform-button {
+    width:840px;
+  }
+
+  .container {
+    width: 800px;
+  }
+
+  .centered-container {
+    text-align: center;
+  }
+
+  .title {
+    font-size: 17px;
+    padding: 0px;
+    margin-bottom: 0px;
+    font-family: Arial,sans-serif;
+    font-weight: bold;
+    text-align: left;
+    margin-left: 270px;
+  }
+ .y-axis-text {
+    text-anchor: middle;
+    font-size: 13px;
+    font-style: italic;
+    font-family: Arial, sans-serif;
+ }
+
+  .axis--y g line {
+    stroke: lightgrey;
+    stroke-width: 1px;
+  }
+
+  .axis--y g:nth-child(2) line {
+    stroke: black
+  }
+
+  .axis--x {
+  	font-size:13px;
+  }
+
+  </style>
+
+
+</style>
+
+
+<div class="container">
+
+    <p> <b>Please go through the information presented and answer the related questions below. </b><br>
+    <br>The chart below shows the percentage of population with access to safe drinking water in two towns - Wilowtown and Silvatown - as of the year 2010.</p>
+<div class="centered-container">
+    <p class="title">Access to safe drinking water in Wilowtown and<br>Silvatown, as of 2010.</p>
+    <svg width="500" height="280"></svg>
+    <div class="centered-container" style="max-height: 0px">
+      <button id="cut" class="button view-button" style="width:0px; height:0px; ">Cut Axis</button>
+      <button class="button transform-button" style="width:0px; height:0px;">Transform!</button>
+    </div>
+  </div>
+  
+<b><p style="text-align: center; font-size: 20px; color:red" id="click_this">Please click the chart above (press and hold the left mouse button) before answering the following questions</p></b>
+
+<p><b>Based on the information presented above, please answer the following questions.</b></p>
+
+<p>How much <b>better</b> do you think the condition of safe drinking water access in Silvatown is as compared to that in Wilowtown?</p>
+   
+   <table align="center" width="100%" border="0" id="test_q">
+        <tr>
+          <td>1</td>
+          <td>2</td>
+          <td>3</td>
+          <td>4</td>
+          <td>5</td>
+        </tr>
+        <tr width="100%">
+        <td width="20%"><span>
+            <input type="radio" name="radio2" id="radio15"  value="1">
+          </span></td>
+          <td width="20%"><span>
+            <input type="radio" name="radio2" id="radio8"  value="2">
+          </span></td>
+          <td width="20%"><span>
+            <input type="radio" name="radio2" id="radio9"  value="3">
+          </span></td>
+          <td width="20%"><span>
+            <input type="radio" name="radio2" id="radio10"  value="4">
+          </span></td>
+          <td width="20%"><span>
+            <input type="radio" name="radio2" id="radio11"  value="5">
+          </span></td>
+        </tr>
+        <td>Slightly Better</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+          <td>Substantially Better</td>
+      </table> 
+</p>
+<br>
+<p>What statistics does the chart show?</p>
+<p align="left">
+  <form id="attention_check">
+      <input type="radio" name="radio1" id="radio1" value="Access to safe drinking water in Wilowtown and Silvatown">
+      <label for="radio">Access to safe drinking water in Wilowtown and Silvatown </label>
+      <br>
+      <input type="radio" name="radio1" id="radio2" value="Access to free food in Wilowtown and Silvatown">
+      <label for="radio2">Access to free food in Wilowtown and Silvatown </label>
+  </form>
+    </p>
+<br><br><br>
+<input type="submit" value="Proceed" onclick="advance()"></input>
+<div style="display:none" id="dialog-confirm" title="Click the chart.">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>Please click the chart (press and hold the left mouse button) before answering the following questions</p> 
+</div>
+ 
+<div>
+
+ <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script src="../static/least-squares.js"></script>
+  <script src="../static/platform.js"></script>
+  <script type="text/javascript">
+    
+    var logging_str = "";
+    logging_str = logging_str + "height: " + $(window).height() + "px;"
+    logging_str = logging_str + "width: " + $(window).height() + "px;"
+    logging_str = logging_str + "platform: " + platform.description + ";"
+
+    var session_start_time = new Date()
+    var start_time = new Date()
+    var end_time = new Date()
+
+    $("svg").on("mousedown", function () {
+      start_time = new Date(); 
+      logging_str = logging_str + "click: " + (start_time - session_start_time)/1000 + "s;"
+    });
+
+    $("svg").on("mouseup", function () {
+      end_time = new Date();
+      logging_str = logging_str + "duration: " + (end_time - start_time)/1000 + "s;"
+      //alert(logging_str)
+    });
+
+    $("#test_q").on("change", function () {
+      input_start_time = new Date(); 
+      logging_str = logging_str + "input change: " + (input_start_time - session_start_time)/1000 + "s;"
+      logging_str += "val: " + $( "#test_q tr td input:checked" ).val() + ";"     
+    });
+
+    $("#attention_check").on("change", function () {
+      input_start_time = new Date(); 
+      logging_str = logging_str + "input change: " + (input_start_time - session_start_time)/1000 + "s;"
+      logging_str += "val: " + $( "#attention_check > input:checked" ).val() + ";"     
+    });
+    
+  </script>
+  <script type="text/javascript">
+    if ((localStorage["condition"] == "A") || (localStorage["condition"] == "B" )) {
+        $("#click_this").remove()
+    }
+
+  	function advance() {
+		
+		let attention_check = $('#attention_check > input:checked').val()
+		if (attention_check) {
+			localStorage.setItem("attention_check",attention_check);
+		}
+		else {
+			alert("Please enter statistics information to proceeed.")
+			return;
+		}
+
+		let val = $('#test_q' + ' tr td input:checked').val()
+	    if (val) {
+		    localStorage.setItem("test_q",val);
+	    }
+	    else {
+	        alert("Please answer all questions to proceed.")
+	        return;
+	    }
+		if (attention_check && val) {
+      logging_str += "Total time: "  + (new Date() - session_start_time)/1000 + "s;"
+      localStorage.setItem("logging",logging_str)
+			window.location.href = "../nfc1"
+		}
+	}
+  </script>
+  <script>
+
+
+//make_vis("data3.tsv")
+var filename = "../static/data.tsv"
+//function make_vis(filename) {
+function make_active(id) {
+  $("button").removeClass("last-clicked");
+  $("#" + id).addClass("last-clicked");
+  
+  remove_line() ;  
+  if ($(".last-clicked").attr("id") == "trendline") {    
+    update_trendline();
+  }
+
+  set_click_listeners(id);
+
+  if ($(".last-clicked").attr("id") == "cut") {
+      
+   }
+
+  if ($(".last-clicked").attr("id") == "zoom") {
+    update_x_axis_underline("zoomline",x(zoom_years[0]) + x.bandwidth()/2, x(zoom_years[1]) + x.bandwidth()/2)
+   }
+
+  if ($(".last-clicked").attr("id") == "fold") {
+    update_x_axis_underline("foldline",x(fold_years[0]) + x.bandwidth()/2, x(fold_years[1]) + x.bandwidth()/2)
+   }
+
+
+    svg.selectAll(".bar").style("fill","rgba(73,100,205,1) ");
+   if ( ($(".last-clicked").attr("id") == "renormalize")) {
+    svg.selectAll(".bar").filter(function (d,i) {return d.letter == renormalize_year}).style("fill","orange");
+   }
+
+
+  if ($(".last-clicked").attr("id") == "filter") {
+    svg.selectAll(".bar").filter(function (d,i) {return filter_list.indexOf(+d.letter) >= 0}).style("fill","orange");
+  }
+
+  if ($(".last-clicked").attr("id") == "zoom") {
+    svg.selectAll(".bar").filter(zoom_func).style("fill","orange");
+  }
+
+  if ($(".last-clicked").attr("id") == "fold") {
+    svg.selectAll(".bar").filter(fold_highlight_func).style("fill","orange");
+  }
+}
+  
+$(".view-button").click(function() {make_active(this.id)})
+
+
+
+// Create basic chart elements
+
+var svg = d3.select("svg"),
+    margin = {top: 15, right: 30, bottom: 30, left: 90},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom;
+
+
+var x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
+    old_x = d3.scaleBand().rangeRound([0, width]).padding(0.1),
+    y = d3.scaleLinear().rangeRound([height, 0]);
+
+var g = svg.append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+// assign globals
+
+
+  // create functions to draw bars
+function getBarFunctions(keyName,y) {
+  function y_function(d) {
+    if (x(d.letter) == undefined) {
+      return y(0);
+    }
+    if (d[keyName]> 0){
+          return y(d[keyName]); 
+      }
+      else {
+        return y(0);
+      }jj
+    }
+
+  function height_function(d) {
+
+    if (x(d.letter) == undefined) {
+      return 0
+    }
+
+    min_val = Math.min(y.domain()[0],y.domain()[1]);
+
+    if (d[keyName] > 0){
+        return y(0) - y(d[keyName])
+    }
+    else {
+      return y(d[keyName]) - y(0);
+    }    
+  }
+
+  return {"y": y_function, "height": height_function};
+}
+
+function drawChart(variable, title,cut) {
+    update_title(title)
+    f = function(d) { return d[variable]}
+    
+    if (d3.min(dd,f) * d3.max(dd,f) >= 0) {
+      //if it doesn't cross 0, use whole chart with 0 at either the top or bottom
+      if (d3.min(dd,f) >= 0) {
+        min_val = 0;
+        max_val = d3.max(dd,f);
+      }
+      else {
+        min_val = d3.min(dd,f);
+        max_val = 0;
+      }
+    }
+    else {
+       max_val = Math.max(-d3.min(dd, f), d3.max(dd, f))
+       min_val = Math.min(-d3.max(dd, f), d3.min(dd, f))
+    }
+
+   	min_val = 0
+   	max_val = 100
+   
+    console.log(min_val,max_val)
+
+    bar_functions = getBarFunctions(variable,y)
+    if (cut != undefined) {
+      min_val = cut_val;
+      max_val = 85
+      bar_functions = {"y" : function(d) {return y(d[variable])},"height" : function(d) {return Math.min(Math.max(y(0) - y(d[variable]),0), Math.max(y(cut_val) - y(d[variable]),0))} };
+    }
+
+    y.domain([min_val, max_val]);
+    tick_vals = [min_val,(max_val-min_val) * 1/4 + min_val,(max_val-min_val) * 2/4 + min_val,(max_val-min_val) * 3/4 + min_val,max_val]
+
+    tick_fn = d3.axisLeft(y)
+			    .tickValues(tick_vals)
+			    .tickSize(width  - 8)
+			    .tickFormat( (d) => (d3.format("(.2f")(d) + "%") )//.attrTween("x",null);
+
+
+    if (g.selectAll("g.axis--y").empty()) {  
+      g.append("g")
+        .attr("class", "axis axis--y")
+        .call(tick_fn)
+        
+
+        
+         g.append("text").attr("transform", "rotate(-90)").attr("y", 0 - margin.left + 15).attr("x", 0 - height / 2).attr("dy","1em").attr("class","y-axis-text").text("Percentage of population with access to")
+         g.append("text").attr("transform", "rotate(-90)").attr("y", 0 - margin.left + 35).attr("x", 0 - height / 2).attr("dy","1em").attr("class","y-axis-text").text("safe drinking water.")
+         
+      }
+    else {
+        g.selectAll("g.axis--y").transition(500).call(tick_fn)
+        //g.selectAll(".tick text").attr("x",-50);        
+      }
+    
+
+      if (g.selectAll(".bar").empty()) {
+      	 g.selectAll(".bar")
+		    .data(dd)
+		//    .enter().append("rect").filter(function(d) { if (+d.letter > 2003) {return true;} })
+		      .enter().append("rect")
+		      .attr("class", "bar")
+		      .attr("x", function(d) { return x(d.letter) + x.bandwidth()/8 + 20; })
+		      .attr("width", x.bandwidth() * 3/4)
+
+		  
+
+      }
+
+        g.selectAll(".bar")
+      .data(dd)
+      .attr("id",function(d,i) {return d.letter;})
+      .transition(500)
+      .attr("y", bar_functions["y"])
+      .attr("height", bar_functions["height"])
+      g.selectAll(".tick text").attr("dx","-0.32em")
+
+
+
+
+   // hack and slash
+   // figure out how to use filter so the stupid redundant bars don't get added at all
+
+}
+
+
+  // load data and store in global variable
+
+var dd;
+var min_x,max_x,min_y,max_y;
+var cut_val;
+var renormalize_year;
+var slope;
+var b;
+
+d3.tsv(filename, function(d) {
+  d.frequency = +d.frequency;
+  return d;
+}, function(error, data) {
+  if (error) throw error;
+
+  dd = data;
+  console.log(dd)
+  // Add derived values
+
+  dd[0]["cum"] = dd[0]["frequency"]
+      for (i=1;i<dd.length;i++)
+      {
+          dd[i]["cum"] = dd[i-1]["cum"] + dd[i]["frequency"]
+      }
+
+  dd[0]["diff"] = 0
+  for (i=1;i<dd.length;i++)
+  {
+      dd[i]["diff"] = dd[i]["frequency"] - dd[i-1]["frequency"]
+  }
+  
+  for (i=0;i<dd.length;i++)
+  {
+      dd[i]["log"] =Math.log(Math.abs(dd[i]["frequency"]))
+  }
+
+  for (i=0;i<dd.length;i++)
+  {
+      dd[i]["ren"] = dd[i]["frequency"] - dd[1]["frequency"]
+  }
+
+  renormalize_year = dd[1]["letter"];
+
+  draw_initial_x_components(data)
+      
+  update_title("Exports")
+
+  ret = {}
+  //lsq = require('least-squares')
+  lsq(dd.map(d => + d.letter), dd.map(d => +d.frequency), ret)
+  console.log(ret)
+
+  min_x = x(d3.min(x.domain())) + x.bandwidth()/2;
+  min_y = y(dd[0].frequency); min_y = y(ret.m * +dd[0].letter + ret.b)
+  max_x = x(d3.max(x.domain())) + x.bandwidth()/2;
+  max_y = y(dd[dd.length-1].frequency); max_y = y(ret.m * +dd[dd.length-1].letter + ret.b)
+
+  mx = d3.max(dd.map(d => +d.frequency)), mm =  d3.min(dd.map(d => +d.frequency))
+  //cut_val = +((mx + mm)/2).toPrecision(3);
+  cut_val = 81
+  make_active("cut")
+
+  if ((localStorage["condition"] == "B") || (localStorage["condition"] == "D")) { 
+      drawChart("frequency","Axis cut at " + cut_val,true);
+
+  }
+  else {
+      drawChart("frequency","Exports")
+  }
+
+  if ((localStorage["condition"] == "C") || (localStorage["condition"] == "D")) { 
+    $("input").attr("disabled","disabled"); 
+    $( function() {
+      $( "#dialog-confirm" ).dialog({
+        resizable: false,
+        height: "auto",
+        width: 400,
+        modal: true,
+        buttons: {
+          "OK": function() {
+            $( this ).dialog( "close" );
+          }
+        }
+      });
+    });
+  }
+});
+
+
+function draw_initial_x_components(data) {
+  x.domain(data.map(function (d,i) {return d.letter}))
+  old_x.domain(data.map(function (d,i) {return d.letter}))
+
+ 
+    g.append("g")
+      .attr("class", "axis axis--x")
+      .attr("transform", "translate(20," + height + ")")
+      .transition()
+      .call(d3.axisBottom(x).tickSize(0).tickSizeOuter(5).tickPadding(10));
+}
+
+
+function draw_x_components(data,domain_filtr,bars_filtr) {
+
+  if (domain_filtr == undefined) {
+    domain_filtr = function (d) {return d.letter;}
+  }
+
+  if (bars_filtr == undefined) {
+    bars_filtr = function () {return true}
+  }
+
+
+  x.domain(data.map(domain_filtr))
+
+  // Do initial x-axis + bar creation
+
+/*
+ g.selectAll(".bar")
+ .data(dd)
+ .enter()
+ .filter(function (d) {if (x(d.letter) == undefined) {return 0} else {return 1}})
+ .raise()
+*/
+
+
+ g.selectAll(".bar")
+      .transition(501)      
+      .attr("x", function(d) { if (x(d.letter)) {return x(d.letter);} else { return old_x(d.letter);} })
+      //.attr()
+      .attr("width", function(d) {if (x(d.letter)) {return x.bandwidth()}else{return old_x.bandwidth()}})
+      
+g.append("rect").attr("width",svg.attr("width")).attr("height",svg.attr("height")).attr("x",0).attr("y",height).style("fill","white");
+
+  svg.select(".axis--x")
+      .transition(500)
+      .call(d3.axisBottom(x));
+  old_x.domain(data.map(domain_filtr))
+}
+
+function redraw_x(data,domain_filtr,bars_filtr) {
+  draw_x_components(data,domain_filtr,bars_filtr)
+  drawChart("frequency","Exports")
+}
+
+if (localStorage["condition"] == "C") {
+  d3.selectAll("svg").on("mousedown", function() {      
+         do_glimpse();
+    });
+
+
+  d3.selectAll("svg").on("mouseup", function() {
+      clear();    
+      $("input").attr("disabled",null)
+  });
+
+  d3.selectAll("svg").on("touchstart", function() {      
+         do_glimpse();
+    });
+
+  d3.selectAll("svg").on("touchend", function() {      
+         clear();
+         $("input").attr("disabled",null)
+  });
+
+}
+else if (localStorage["condition"] == "D") {
+  d3.selectAll("svg").on("mousedown", function() {      
+         clear()
+    });
+
+
+  d3.selectAll("svg").on("mouseup", function() {
+      do_glimpse();    
+      $("input").attr("disabled",null)
+  });
+
+  d3.selectAll("svg").on("touchstart", function() {      
+         clear()
+    });
+
+  d3.selectAll("svg").on("touchend", function() {      
+         do_glimpse();
+         $("input").attr("disabled",null)
+  });
+
+}
+
+var filter_list = [2003,2004,2009];
+
+function do_filter() {
+  
+  function filter_domain_filter(d) {
+    if (filter_list.indexOf(+d.letter) >= 0)
+    {
+      return d.letter;
+    }
+    else {
+      
+      return filter_list[0];
+    }
+  }
+
+  function filter_bars_filter(d) {
+    if (filter_list.indexOf(+d.letter) >= 0)   
+    {
+        return true;
+    }
+  }
+    redraw_x(dd,filter_domain_filter,filter_bars_filter);
+    svg.selectAll(".bar").filter(function (d,i) {return filter_list.indexOf(+d.letter) >= 0}).style("fill","orange");
+}
+
+
+
+function do_zoom() {
+  remove_line();
+  function zoom_domain_filter(d) {
+    if (zoom_func(d))
+    {
+      return d.letter;
+    }
+    else {
+      console.log(d);
+      return zoom_years[0];
+    }
+  }
+
+  function zoom_bars_filter(d) {
+    if (zoom_func(d))   
+    {
+        return true;
+    }
+  }
+    redraw_x(dd,zoom_domain_filter,zoom_bars_filter);
+    svg.selectAll(".bar").filter(zoom_func).style("fill","orange");
+
+}
+
+
+function do_fold() {
+  remove_line();
+  function fold_domain_filter(d) {
+    if (fold_display_func(d,i))
+    {
+      return d.letter;
+    }
+    else {
+      return fold_years[0];
+    }
+  }
+
+  function fold_bars_filter(d) {
+    if (fold_display_func(d,i))   
+    {
+        return true;
+    }
+  }
+    redraw_x(dd,fold_domain_filter,fold_bars_filter);
+
+  svg.selectAll(".bar").filter(fold_highlight_func).style("fill","orange");
+
+}
+
+
+function animate_axis_cut() {
+  svg.selectAll(".axisline").transition(500).attr("transform", "translate(0," + y(cut_val) + ")");
+}
+
+function animate_trendline(backward) {
+  if (backward == undefined) {
+    svg.selectAll("line.trendline").transition(500).attr("y1",y(0)).attr("y2",y(0));
+    svg.selectAll("line.dashline").transition(500).attr("y1",y(0)).attr("y2",y(0));
+    svg.selectAll("g > circle").transition(500).attr("cy",y(0) + 20);
+  }
+  else {
+   svg.selectAll("line.trendline").transition(500).attr("y1",min_y).attr("y2",max_y);
+   svg.selectAll("g.startpoint > circle").transition(500).attr("cy",min_y + 20)
+   svg.selectAll("g.endpoint > circle").transition(500).attr("cy",max_y  +  20)
+
+   svg.selectAll("line.dashline.left").transition(500).attr("y1",min_y).attr("y2",b);
+   svg.selectAll("line.dashline.right").transition(500).attr("y1",max_y).attr("y2",960 * slope + b);
+  }
+
+}
+
+
+function do_glimpse() {
+  id = $(".last-clicked").attr("id")
+
+  switch(id) {
+    case "log": drawChart("log","Log Exports"); break;
+    case "cum": drawChart("cum","Cumulative Exports"); break;
+    case "diff": drawChart("diff","Yearly Change"); break;
+    case "renormalize": drawChart("ren","Difference from " + renormalize_year); break;
+    case "trendline": do_trendline_deviation(); animate_trendline(); break;
+    case "cut": drawChart("frequency","Axis cut at " + cut_val,true); break;
+    case "zoom": do_zoom(); break;
+    case "filter": do_filter(); break;
+    case "fold": do_fold(); break;
+  } 
+}
+
+function append_point(point,cx,cy) {
+  g.append("g")
+        .attr("class", point)
+        .attr("transform", "translate(-40,-20)")
+        .append("circle")
+        .attr("cx",cx)
+        .attr("cy",cy)
+        .attr("class","marker")
+        .call(update_trendline);
+}
+
+// add listeners to detect click events
+
+function trendlineClickListener (point) {
+  function listener(d,i) {
+      d3.event.preventDefault();
+      
+      var coords = d3.mouse(this);
+      
+      svg.selectAll("g." + point).remove()
+      
+      append_point(point,d3.mouse(this)[0],d3.mouse(this)[1])
+  }
+  return listener;
+}
+
+
+function filterClickListener(d,i) {
+ 
+   idx = filter_list.indexOf(+d.letter);
+   if( idx >= 0) {
+    if (filter_list.length > 1) {
+      filter_list.splice(idx,1)
+      svg.selectAll(".bar").filter(function (x,i) {return d.letter == x.letter}).style("fill","");
+    }
+   }
+   else {
+      filter_list.push(+d.letter);
+      svg.selectAll(".bar").filter(function (x,i) {return d.letter == x.letter}).style("fill","orange");
+    }
+  filter_list.sort(function(a, b){return a-b})
+}
+
+
+function renormalizeClickListener(d,i) {
+  renormalize_year = d.letter;
+  svg.selectAll(".bar").filter(function (d,i) {return d.letter == renormalize_year}).style("fill","orange");
+  svg.selectAll(".bar").filter(function (d,i) {return d.letter != renormalize_year}).style("fill","");
+  for (i=0;i<dd.length;i++)
+  {
+      dd[i]["ren"] =dd[i]["frequency"] - d["frequency"]
+  }
+}
+
+// cut_val is a global defined above, initialized to 0
+function cutClickListener(d,i) {
+  cut_val = +d;
+  update_cut_axis_line()
+}
+
+var fold_clicks = 0;
+var fold_years = [2001,2007]
+function foldClickListener(d,i) {
+  fold_years[fold_clicks%2] = +d;
+  fold_years.sort(function(a, b){return a-b});
+  fold_clicks+=1;
+  
+  update_x_axis_underline("foldline",x(fold_years[0]) + x.bandwidth()/2, x(fold_years[1]) + x.bandwidth()/2)
+  svg.selectAll(".bar").filter(fold_highlight_func).style("fill","orange");
+  svg.selectAll(".bar").filter(function (d,i) {return ! fold_highlight_func(d,i) }).style("fill","");
+}
+
+var zoom_clicks = 0;
+var zoom_years = [2002,2005];
+function zoomClickListener(d,i) {
+  zoom_years[zoom_clicks%2] = +d;
+  zoom_years.sort(function(a, b){return a-b});
+  zoom_clicks+=1;
+  
+  update_x_axis_underline("zoomline",x(zoom_years[0]) + x.bandwidth()/2, x(zoom_years[1]) + x.bandwidth()/2);
+  svg.selectAll(".bar").filter(zoom_func).style("fill","orange");
+  svg.selectAll(".bar").filter(function (d,i) {return ! zoom_func(d,i)}).style("fill","");
+
+
+}
+
+function clear_click_listeners() {
+  svg.on("click", null);
+  svg.on("contextmenu", null);
+  svg.selectAll(".bar").on("click",null)  
+}
+
+
+var closer;
+
+function lineDragStartListener (array) {
+  closer = +(Math.abs(x(array[0]) - d3.event.x)  >  Math.abs(x(array[1]) - d3.event.x))
+  console.log(closer)
+}
+
+function lineDraggedListener (array,line,func) {
+    var x_vals = [];
+    
+    d3.map(x.domain(),function(d){x_vals.push(Math.abs(x(d) - d3.event.x))})
+    
+    var m = d3.min(x_vals)
+
+    console.log(x.domain()[x_vals.indexOf(m)])
+
+    if (array[closer] != x.domain()[x_vals.indexOf(m)]){
+      array[closer] = x.domain()[x_vals.indexOf(m)];
+      update_x_axis_underline(line,x(array[0]) + x.bandwidth()/2, x(array[1]) + x.bandwidth()/2);
+
+      svg.selectAll(".bar").filter(func).style("fill","orange");
+      svg.selectAll(".bar").filter(function (d,i) {return ! func(d,i)}).style("fill","");
+    }
+
+}
+
+function pointDraggedListener(d){
+
+ var x_vals = [];
+    
+ d3.map(x.domain(),function(d){x_vals.push(Math.abs(x(d) - d3.event.x + 3 * x.bandwidth() / 2))})
+    
+ var m = d3.min(x_vals)
+  
+ console.log(x.domain()[x_vals.indexOf(m)])
+
+ d3.select(this).attr("cx", x(x.domain()[x_vals.indexOf(m)]) + 3 * x.bandwidth() / 2).attr("cy", d3.event.y);
+ update_trendline();
+}
+
+
+function set_click_listeners(id) {
+
+  clear_click_listeners()
+  switch(id) {
+    case "trendline":
+      //svg.on("click", trendlineClickListener("startpoint"));
+      //svg.on("contextmenu", trendlineClickListener("endpoint"));
+      svg.selectAll("g.endpoint > circle").call(d3.drag().on("drag", pointDraggedListener));
+      svg.selectAll("g.startpoint > circle").call(d3.drag().on("drag", pointDraggedListener));
+      break;
+    case "renormalize":
+      svg.selectAll(".bar").on("click", renormalizeClickListener).on("touchstart", renormalizeClickListener);   
+      break;    
+    case "cut":
+      svg.selectAll(".axis--y > .tick").on("click", cutClickListener).on("touchstart", cutClickListener);
+      break;
+    case "zoom":
+      svg.selectAll(".axis--x > .tick").on("click", zoomClickListener).on("touchstart", zoomClickListener);
+      break;
+    case "fold":
+      svg.selectAll(".axis--x > .tick").on("click", foldClickListener).on("touchstart", foldClickListener);
+      break;
+    case "filter":
+      svg.selectAll(".bar").on("click", filterClickListener).on("touchstart", filterClickListener)
+      break;
+  }
+
+}
+
+function update_x_axis_underline (line_type,x1,x2) {
+  // line_type == "zoomline"
+  svg.selectAll("." + line_type).remove()
+
+  g.append("line")
+    .attr("class",line_type) 
+    .attr("x1",x1)
+    .attr("y1",height + 5/6 * margin.bottom)
+    .attr("x2",x2)
+    .attr("y2",height + 5/6 * margin.bottom)
+    .attr("stroke","orange")
+    .attr("stroke-width","10px");
+
+    if (line_type == "zoomline") {
+      svg.selectAll(".zoomline").call(d3.drag().on("start", function(){lineDragStartListener(zoom_years)}).on("drag", function(){lineDraggedListener(zoom_years,"zoomline",zoom_func)}));
+    }
+    else {
+      svg.selectAll(".foldline").call(d3.drag().on("start", function(){lineDragStartListener(fold_years)}).on("drag", function(){lineDraggedListener(fold_years,"foldline",fold_highlight_func)}));
+    }
+}
+
+
+function axislineDraggedListener(d) {
+  let v = Math.max(+y.invert(d3.event.y),d3.min(y.domain()))
+  d3.selectAll(".axisline").attr("transform",  "translate(0," + y(v) + ")" );
+  cut_val = v.toPrecision(3)
+  console.log(d3.event.y)
+}
+
+function update_cut_axis_line () {
+  // line_type == "zoomline"
+  svg.selectAll(".axisline").remove()
+
+  ax = g.append("g")
+    .attr("class","axisline") 
+    .attr("transform", "translate(0," + y(cut_val) + ")");
+  ax.append("line")
+    .attr("x1",0)
+    .attr("y1",0)
+    .attr("x2",960)
+    .attr("y2",0)
+    .attr("stroke","black")
+    .attr("stroke-width","3px");
+    svg.call(d3.drag().on("drag", axislineDraggedListener));
+
+  ax.append("polygon").attr("points", "0,10  10,0 0,-10").style("fill","black");
+  ax.append("polygon").attr("points", "900,10  890,0 900,-10").style("fill","black");
+}
+
+
+
+function update_trendline() {
+  svg.selectAll("line.trendline").remove();
+  svg.selectAll("line.dashline").remove();
+
+  // try adding the startpoints if they are not there
+  // but a previous update_trendline call has stored vals in min_x, min_y, etc.
+  if (svg.select("g.startpoint").empty() && svg.select("g.endpoint").empty())
+  {
+    if (min_x + min_y + max_x + max_y  + 0 != NaN) {
+        append_point("startpoint",min_x + 40,min_y + 20)
+        append_point("endpoint",max_x + 40,max_y + 20);
+        svg.selectAll("g.endpoint > circle").call(d3.drag().on("drag", pointDraggedListener));
+        svg.selectAll("g.startpoint > circle").call(d3.drag().on("drag", pointDraggedListener));
+    }
+  }
+
+  if (! svg.select("g.startpoint").empty() && ! svg.select("g.endpoint").empty())
+  {
+      
+      if (+svg.select("g.startpoint > circle").attr("cx") > +svg.select("g.endpoint > circle").attr("cx")) {
+          min_x = +svg.select("g.endpoint > circle").attr("cx") - 40
+          min_y = +svg.select("g.endpoint > circle").attr("cy") - 20
+          max_x = +svg.select("g.startpoint > circle").attr("cx") - 40
+          max_y = +svg.select("g.startpoint > circle").attr("cy") - 20
+      }
+      else {
+          min_x = +svg.select("g.startpoint > circle").attr("cx") - 40
+          min_y = +svg.select("g.startpoint > circle").attr("cy") - 20
+          max_x = +svg.select("g.endpoint > circle").attr("cx") - 40
+          max_y = +svg.select("g.endpoint > circle").attr("cy") - 20      
+      }
+      
+      
+      g.append("line")
+          .attr("class", "trendline")
+          .attr("x1",min_x)
+          .attr("y1",min_y)
+          .attr("x2",max_x)
+          .attr("y2",max_y)
+          .attr("stroke","black");
+
+      slope =   (max_y - min_y) / (max_x - min_x);
+
+      b = min_y - slope * min_x;
+      
+      g.append("line")
+          .attr("class", "dashline left")
+          .attr("x1",min_x)
+          .attr("y1",min_y)
+          .attr("x2", 0)
+          .attr("y2", b)
+          .attr("stroke","black")
+          .attr("stroke-dasharray","10,10");
+
+          g.append("line")
+          .attr("class", "dashline right")
+          .attr("x1",max_x)
+          .attr("y1",max_y)
+          .attr("x2", 960)
+          .attr("y2", slope * 960 + b)
+          .attr("stroke","black")
+          .attr("stroke-dasharray","10,10");
+  }
+}
+
+function fold_highlight_func(d,i) {return (+d.letter == Math.min(fold_years[0],fold_years[1]) || (+d.letter == Math.max(fold_years[0],fold_years[1]))) }
+
+function fold_display_func(d,i) {return (+d.letter <= Math.min(fold_years[0],fold_years[1]) || (+d.letter >= Math.max(fold_years[0],fold_years[1]))) }
+
+function zoom_func(d,i) {return(+d.letter >= Math.min(zoom_years[0],zoom_years[1]) && (+d.letter <= Math.max(zoom_years[0],zoom_years[1])))}
+
+
+function remove_line() {
+  svg.selectAll("g.endpoint").remove();
+  svg.selectAll("g.startpoint").remove();
+  svg.selectAll(".axisline").remove();
+  svg.selectAll(".trendline").remove();
+  svg.selectAll(".zoomline").remove();
+  svg.selectAll(".foldline").remove();
+  svg.selectAll(".dashline").remove();
+}
+
+function do_trendline_deviation() {
+
+  if (svg.select("g.startpoint").empty() || svg.select("g.endpoint").empty()) {
+    return;
+  }
+    
+ for (i=0;i<dd.length;i++)
+  {
+    line_height = (max_y - min_y) * (x(dd[i].letter) + x.bandwidth() / 2 - min_x) / (max_x - min_x) + min_y;
+    console.log(line_height)
+    console.log(y(dd[i].frequency))
+    dd[i]["dev"] = dd[i].frequency - y.invert(line_height)  ;
+  }
+
+//  remove_line()
+
+  drawChart("dev","Deviation from Trend Line")
+}
+
+function clear() {    
+
+   drawChart("frequency","Exports");    
+
+   if ($(".last-clicked").attr("id") == "trendline") {
+    //update_trendline();
+    animate_trendline(true);
+   }
+   else if  ($(".last-clicked").attr("id") == "cut"){
+    
+   }
+   else {
+    remove_line() ;      
+   }
+   
+  if ($(".last-clicked").attr("id") == "filter") {
+    redraw_x(dd);
+    svg.selectAll(".bar").filter(function (d,i) {return filter_list.indexOf(+d.letter) >= 0}).style("fill","orange");
+   }
+
+  if ($(".last-clicked").attr("id") == "zoom") {
+    redraw_x(dd);
+    update_x_axis_underline("zoomline",x(zoom_years[0]) + x.bandwidth()/2, x(zoom_years[1]) + x.bandwidth()/2)
+    svg.selectAll(".bar").filter(zoom_func).style("fill","orange");
+   }
+
+  if ($(".last-clicked").attr("id") == "fold") {
+    redraw_x(dd);
+    update_x_axis_underline("foldline",x(fold_years[0]) + x.bandwidth()/2, x(fold_years[1]) + x.bandwidth()/2)
+    svg.selectAll(".bar").filter(fold_highlight_func).style("fill","orange");
+
+   }
+
+  set_click_listeners($(".last-clicked").attr("id"));
+}
+
+function update_title(txt)
+{
+ 
+}
+//}
+
+</script> 
