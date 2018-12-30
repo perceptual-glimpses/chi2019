@@ -1,0 +1,41 @@
+body {
+	font-family: "Times New Roman", Times, serif;
+	font-size:16px;
+}
+
+h1 {
+	font-size: 24px;
+}
+
+.container {
+	margin: auto;
+	max-width: 800px;
+}
+
+li {
+	line-height: 200%;
+}
+
+input[type=text] {
+	margin-left:20px;
+}
+
+input[type=submit] {
+	font-size:25px;
+}
+
+form input,table {
+	margin-left: 20px;
+}
+
+
+td {
+	font-size:16px;	
+	text-align: center;
+}
+
+input[type="radio"] {
+    -ms-transform: scale(1.5); /* IE 9 */
+    -webkit-transform: scale(1.5); /* Chrome, Safari, Opera */
+    transform: scale(1.5);
+}
