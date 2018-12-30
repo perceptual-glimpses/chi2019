@@ -45,9 +45,9 @@ The following files are included:
 
 These HTML pages were initially run using on heroku using flask and gunicorn, and responses were stored in a PostgreSQL database. I have not included the back-end code in this repository.
 
-The cartogram example, which is based on this New York Times infographic, requires the proprietary GreenSock Animation Platform MorphSVG Plugin, and cannot be run directly unless you purchase this product. However, it can be run at [this CodePen.io link](https://codepen.io/jritch/pen/bOYpvO).
+The cartogram example, which is based on [this New York Times infographic](http://graphics8.nytimes.com/packages/images/us/20031108_RECALL_MAP/california_recall.gif), requires the proprietary GreenSock Animation Platform MorphSVG Plugin, and cannot be run directly unless you purchase this product. However, it can be run at [this CodePen.io link](https://codepen.io/jritch/pen/bOYpvO).
 
-The route map example, which adapts a chart from Maneesh Agrawala's LineDrive paper, requires a Google Maps API key to run properly. To add an API key, change the following line from:
+The route map example, which adapts a chart from Maneesh Agrawala et. al.'s LineDrive paper, requires a Google Maps API key to run properly. To add an API key, change the following line from:
 
 ```html
 <script src="//maps.google.com/maps/api/js?sensor=true"></script>
