@@ -32,7 +32,11 @@ The following files are included:
 ```shell
 #Study I
 
-[list of files]
+study_1/static/controls.html	
+study_1/static/demo.html	
+study_1/static/questions.html	
+study_1/static/userinfo.html	
+study_1/static/vis_app_demo.html
 
 #Study II
 
