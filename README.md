@@ -58,7 +58,7 @@ phase_1/templates/vis_app_demo.html
 phase_2/static/index.html
 
 #Design Examples
-
+----------------
 route_map_demo/templates/map_demo.html
 ```
 
