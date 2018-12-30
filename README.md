@@ -31,20 +31,35 @@ The following files are included:
 
 ```shell
 #Study I
+#--------
 
-study_1/static/controls.html	
-study_1/static/demo.html	
-study_1/static/questions.html	
-study_1/static/userinfo.html	
-study_1/static/vis_app_demo.html
+study_1/templates/calibration.html
+study_1/templates/chartfam.html
+study_1/templates/consent.html	
+study_1/templates/finish.html	
+study_1/templates/nfc1.html
+study_1/templates/test.html	
+study_1/templates/userinfo.html	
+study_1/templates/visab.html
 
 #Study II
+#--------
 
-[list of files]
+# Phase I
+#--------
+phase_1/templates/controls.html	
+phase_1/templates/demo.html	
+phase_1/templates/questions.html	
+phase_1/templates/userinfo.html	
+
+# Phase II
+#--------
+phase_1/templates/vis_app_demo.html
+phase_2/static/index.html
 
 #Design Examples
 
-[list of files]
+route_map_demo/templates/map_demo.html
 ```
 
 These HTML pages were initially run using on heroku using flask and gunicorn, and responses were stored in a PostgreSQL database. I have not included the back-end code in this repository.
