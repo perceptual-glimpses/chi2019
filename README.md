@@ -76,7 +76,7 @@ These HTML pages were initially run using on heroku using flask and gunicorn, an
 
 The cartogram example, which is based on [this New York Times infographic](http://graphics8.nytimes.com/packages/images/us/20031108_RECALL_MAP/california_recall.gif), requires the proprietary GreenSock Animation Platform MorphSVG Plugin, and cannot be run directly unless you purchase this product. However, it can be run at [this CodePen.io link](https://codepen.io/jritch/pen/bOYpvO).
 
-The route map example, which adapts a chart from [Maneesh Agrawala et. al.'s LineDrive paper], requires a Google Maps API key to run properly. To add an API key, [follow these instructions to obtain a key](https://developers.google.com/maps/documentation/javascript/get-api-key), and then change the following line in "route_map_demo/templates/map_demo.html" from:
+The route map example, which adapts a chart from [Maneesh Agrawala et. al.'s LineDrive paper](http://graphics.stanford.edu/papers/routemaps/), requires a Google Maps API key to run properly. To add an API key, [follow these instructions to obtain a key](https://developers.google.com/maps/documentation/javascript/get-api-key), and then change the following line in "route_map_demo/templates/map_demo.html" from:
 
 ```html
 <script src="//maps.google.com/maps/api/js?sensor=true"></script>
