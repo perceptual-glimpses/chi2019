@@ -3,7 +3,7 @@ This repository provides replication materials for our CHI 2019 paper, **A Lie R
 
 This website includes all questionnaires used in the experiment, as well as all code used for interactive charts.
 
-It also includes [a link to the preregistration of our procedure, analysis, hypotheses for Study 1](https://aspredicted.org/blind.php?x=cz33i9).
+It also includes [a link to the preregistration of our procedure, analysis, hypotheses for Study 1](https://aspredicted.org/7zn4f.pdf).
 
 To view the charts or questionnaires in your web browser, download or clone the repository and in the root directory run one of the following python commands.
 
